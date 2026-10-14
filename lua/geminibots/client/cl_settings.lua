@@ -24,6 +24,7 @@ local TABS = {
     { id = "combat", ru = "Бой и движение", en = "Combat", icon = "bomb" },
     { id = "admin", ru = "Админ", en = "Admin", icon = "shield" },
     { id = "menu", ru = "Меню", en = "Menu", icon = "palette" },
+    { id = "about", ru = "Об аддоне", en = "About", icon = "info" },
 }
 
 -- Шимы методов панели под интерфейс построителя меню (темные контролы)
@@ -107,6 +108,8 @@ local function BuildTab(frame, id)
     if id == "menu" then
         -- Вкладка меню строится через свою функцию ниже по файлу
         GeminiBots.BuildMenuTabInner(frame, data.form)
+    elseif id == "about" then
+        GeminiBots.BuildAboutTabInner(frame, data.form)
     else
         GeminiBots.SetSettingsTarget(data.form, id, { noSharedHeader = true })
         GeminiBots.BuildSettingsMenu(data.form, id, { noSharedHeader = true })
@@ -116,6 +119,44 @@ local function BuildTab(frame, id)
     for tid, nav in pairs(frame.GeminiNav or {}) do
         if IsValid(nav) then nav.activeTab = (tid == id) end
     end
+end
+
+-- Вкладка "Об аддоне": кратко, версия, создатели, ссылка на GitHub
+function GeminiBots.BuildAboutTabInner(frame, form)
+    form:ClearControls()
+    local T = GeminiBots.Theme
+    local ru = (GeminiBots.GetMenuLang() == "ru")
+    form.GeminiIsMenuTab = true
+    GeminiBots.SetSettingsTarget(form, "about", { noSharedHeader = true })
+
+    local head = vgui.Create("DPanel", form)
+    head:Dock(TOP)
+    head:SetTall(T.SZ(64))
+    head:DockMargin(0, 0, 0, 6)
+    head.Paint = function(_, w, h)
+        T.DrawLogo(T.LogoVariant(), 8, math.floor((h - 40) / 2), 40, T.Colors.accent)
+        T.DrawSpaced("GeminiBots", "GeminiHeader", 58, math.floor(h / 2) - 10,
+            T.Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1)
+        T.DrawSpaced(ru and "Живые боты для Garry's Mod" or "Smarter bots for Garry's Mod",
+            "GeminiSmall", 59, math.floor(h / 2) + 12,
+            T.Colors.muted, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1)
+    end
+
+    T.MutedLabel(form, ru and "Версия: 1.0.0" or "Version: 1.0.0")
+    T.MutedLabel(form, ru and "Автор: mcarabic98" or "Author: mcarabic98")
+    T.MutedLabel(form, ru and "Совместная разработка: OpenCode" or "Co-developed with: OpenCode")
+    T.MutedLabel(form, ru and "ИИ стандартных ботов: бой, чувства, чат, оружие, режимы."
+        or "Stock bot AI: combat, senses, chat, weapons, gamemodes.")
+
+    local btnGH = T.AccentButton(form, "GitHub: mcarabic98/geminibots")
+    btnGH.DoClick = function()
+        T.ClickSound()
+        gui.OpenURL("https://github.com/mcarabic98/geminibots")
+    end
+    T.Tooltip(btnGH, "https://github.com/mcarabic98/geminibots")
+
+    T.MutedLabel(form, ru and "Открытие/закрытие окна: bind p geminibots_menu"
+        or "Toggle window: bind p geminibots_menu")
 end
 
 -- Вкладка "Меню" (только здесь): настройки интерфейса. Храним в GeminiBots,

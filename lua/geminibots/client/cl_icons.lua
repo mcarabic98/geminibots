@@ -121,9 +121,23 @@ local function IconPalette(x, y, s, col, detail)
     ThickLine(cx - s * 0.05, cy + s * 0.28, cx + s * 0.22, cy + s * 0.05, 2.4, dot)
 end
 
+-- Буква i в круге (вкладка "Об аддоне")
+local function IconInfo(x, y, s, col, detail)
+    local cx, cy = x + s / 2, y + s / 2
+    local r = s * 0.40
+    for i = 0, 28 do
+        local a1 = i / 28 * math.pi * 2
+        local a2 = (i + 1) / 28 * math.pi * 2
+        ThickLine(cx + math.cos(a1) * r, cy + math.sin(a1) * r,
+            cx + math.cos(a2) * r, cy + math.sin(a2) * r, 2, col)
+    end
+    Disc(cx, cy - s * 0.12, s * 0.055, col)
+    ThickLine(cx, cy - s * 0.01, cx, cy + s * 0.26, s * 0.11, col)
+end
+
 T.IconDrawers = {
     cog = IconCog, gun = IconGun, bomb = IconBomb,
-    shield = IconShield, palette = IconPalette,
+    shield = IconShield, palette = IconPalette, info = IconInfo,
 }
 
 function T.DrawIcon(name, x, y, s, col, detail)
