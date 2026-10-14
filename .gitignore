@@ -1,0 +1,11 @@
+# Runtime-generated (server creates these, never commit)
+data/geminibots/convars.json
+data/geminibots/saved_session.json
+data/geminibots/*_prev_config.json
+data/geminibots/deleted_packs.json
+data/geminibots/skill_presets.json
+data/geminibots/pack_adapters.json
+data/geminibots/weapon_dump.txt
+data/geminibots/logs/
+data/geminibots/chat/
+data/geminibots/states/

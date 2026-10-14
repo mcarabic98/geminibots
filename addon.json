@@ -1,0 +1,13 @@
+{
+  "title": "GeminiBots - Enhanced Default Bots",
+  "type": "ServerContent",
+  "tags": [
+    "fun",
+    "realism"
+  ],
+  "ignore": [
+    "*.git*",
+    ".vscode*",
+    "README.md"
+  ]
+}

@@ -1,0 +1,41 @@
+# ==============================================================================
+# GeminiBots - Список оружия для выдачи ботам / Bot Weapon Pool
+# ==============================================================================
+# Каждый класс оружия указывается с новой строки.
+# Строки, начинающиеся с #, являются комментариями и игнорируются.
+# Если оружие из аддона (например, M9K) не установлено на сервере,
+# бот автоматически пропустит его без ошибок.
+# ==============================================================================
+
+# Стандартное оружие Half-Life 2 / Garry's Mod
+weapon_pistol
+weapon_357
+weapon_smg1
+weapon_ar2
+weapon_shotgun
+weapon_crossbow
+weapon_crowbar
+weapon_rpg
+
+# Популярный пак M9K Specialties / Small Arms / Assault Rifles
+m9k_colt1911
+m9k_deagle
+m9k_glock
+m9k_usp
+m9k_ragingbull
+m9k_ak47
+m9k_m4a1
+m9k_mp5
+m9k_ump45
+m9k_vector
+m9k_famas
+m9k_scar
+m9k_val
+m9k_spas12
+m9k_remington870
+m9k_mossberg590
+m9k_striker
+m9k_awp
+m9k_barret_m82
+m9k_svu
+m9k_dragunov
