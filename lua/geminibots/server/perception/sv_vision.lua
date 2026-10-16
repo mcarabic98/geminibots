@@ -245,7 +245,9 @@ function GeminiBots.Vision:FindBestTarget(bot)
                 bot.investigateTime = CurTime()
                 bot.investigateKind = "steps"
                 if bot.state == "idle" or bot.state == "wander" then
-                    bot.desiredViewAngles = (e:GetPos() - bot.ply:EyePos()):Angle()
+                    -- Только yaw: разворот к ногам накоротке кладет pitch (см. ниже)
+                    local yawTo = (e:GetPos() - bot.ply:EyePos()):Angle().y
+                    bot.desiredViewAngles = Angle(0, yawTo, 0)
                     GeminiBots.FSM:SetState(bot, "wander")
                 end
             end
@@ -315,9 +317,12 @@ function GeminiBots.Vision:FindBestTarget(bot)
                     bot.heardDist = hearDist
                 end
 
-                -- Гулял или стоял: поворачиваемся к источнику шума
+                -- Гулял или стоял: поворачиваемся к источнику шума.
+                -- Только по горизонтали: разворот к ногам (GetPos) накоротке
+                -- давал pitch под -89 и вечную петлю "слышу ноги, вижу ноги"
                 if bot.state == "idle" or bot.state == "wander" then
-                    bot.desiredViewAngles = (ent:GetPos() - bot.ply:EyePos()):Angle()
+                    local yawTo = (ent:GetPos() - bot.ply:EyePos()):Angle().y
+                    bot.desiredViewAngles = Angle(0, yawTo, 0)
                     GeminiBots.FSM:SetState(bot, "wander")
                 end
             end
