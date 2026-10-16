@@ -46,7 +46,7 @@
 - Боты: `geminibots_add`, `geminibots_spawn_max` (= `geminibots_fill`), `geminibots_kick_all`, `geminibots_reload`, `geminibots_save_bots`, `geminibots_restore_bots`.
 - Оружие: `geminibots_weapon_list`, `_toggle <класс>`, `_add`, `_remove`, `_preset <hl2|m9k|all|none|pistols|rifles|shotguns|snipers|default>`, `_reload`, `_scan`, `_prune`, `_clear_broken`, `geminibots_weapons_menu`, `geminibots_weapon_dump`, `geminibots_pack_list`.
 - Ники/вид: `geminibots_names_reroll`, `geminibots_names_reload`, `geminibots_appearance_reroll`.
-- Админ: `geminibots_bring [ник|*]`, `geminibots_goto <ник>`, `geminibots_bot_info [ник]`, `geminibots_esp`, `geminibots_debug_draw_toggle`, `geminibots_reset_defaults` (сброс конваров).
+- Админ: `geminibots_bring [ник|*]`, `geminibots_goto <ник>`, `geminibots_bot_info [ник]`, `geminibots_bot_aim <ник>` (замер наводки и огня), `geminibots_esp`, `geminibots_debug_draw_toggle`, `geminibots_reset_defaults` (сброс конваров).
 - Чат-паки: `geminibots_chat_pack_list`, `_toggle <файл>`, `_reload_packs`, `_delete`, `_restore`.
 - FSM: `geminibots_states_list`, `geminibots_states_reload`, `geminibots_bot_state <ник> <состояние>`.
 - ULX (если стоит): `!bringbots`, `!gotobot <ник>`, `!addbot [N]`, `!kickbots`, `!botinfo [ник]`, `!botpreset <имя>`, `!botstate <ник> <состояние>`.
