@@ -20,6 +20,7 @@ function GeminiBots.Aiming:ProjectileSpeed(wepClass)
 end
 
 local CachedGravity = nil
+local CachedGravityAt = -9999
 
 -- Расчет точки и углов прицеливания в цель.
 -- Голова/торс и разброс роллятся раз на цель (и раз в 2 сек), а не каждый
@@ -50,7 +51,9 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         if okH and headPos then aimPos = headPos end
     end
 
-    -- 2. Упреждение движения цели (Lead Aim)
+    -- 2. Упреждение движения цели (Lead Aim).
+    -- Только горизонталь: прыжок цели иначе уводит точку в небо.
+    -- Плоское: прыжки не предсказываем
     if cfg and cfg.AimPrediction then
         local dist = eyePos:Distance(aimPos)
         local activeWep = bot.ply:GetActiveWeapon()
@@ -58,11 +61,16 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         local timeToHit = dist / projectileSpeed
 
         local targetVel = target:GetVelocity()
+        targetVel.z = 0
         aimPos = aimPos + targetVel * timeToHit
     end
 
-    -- 3. Вычисление базовых углов
+    -- 3. Вычисление базовых углов. Клинч (точки совпали) дает вырожденный
+    -- угол (движок вернет pitch 90): держим прошлый прицел вместо взлета
     local toTarget = (aimPos - eyePos)
+    if toTarget:LengthSqr() < 1 then
+        return bot.lastAimAngles or Angle(0, 0, 0)
+    end
     local aimAngle = toTarget:Angle()
 
     -- 4. Добавление естественного разброса (Inaccuracy)
@@ -92,9 +100,12 @@ end
 function GeminiBots.Aiming:CalculateLobAngles(bot, targetPos, throwSpeed)
     local eyePos = bot.ply:EyePos()
 
-    if not CachedGravity then
+    -- Гравитацию обновляем раз в минуту: смена среди игры подхватывается,
+    -- каждый тик GetConVar не дергаем
+    if not CachedGravity or CurTime() - CachedGravityAt > 60 then
         local gravCvar = GetConVar("sv_gravity")
         CachedGravity = (gravCvar and gravCvar:GetFloat()) or 600
+        CachedGravityAt = CurTime()
     end
     local g = CachedGravity
 

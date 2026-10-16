@@ -8,6 +8,7 @@ GeminiBots.Vision = GeminiBots.Vision or {}
 
 -- Проверка валидности потенциальной цели
 function GeminiBots.Vision:IsValidTarget(bot, ent)
+    if not bot or not IsValid(bot.ply) then return false end
     if not IsValid(ent) then return false end
     if ent == bot.ply then return false end
 
@@ -66,13 +67,17 @@ function GeminiBots.Vision:CanTargetClass(bot, ent)
     return true
 end
 
--- Проверка прямой видимости (Line Of Sight)
+-- Проверка прямой видимости (Line Of Sight).
+-- Глаза/центр чужих сущностей берем через pcall: часть модовых SENT
+-- без глаз роняла бы каждый прямой вызов тика
 function GeminiBots.Vision:HasLineOfSight(bot, target)
     if not IsValid(target) then return false end
 
-    local eyePos = bot.ply:EyePos()
-    local targetHead = target:EyePos()
-    local targetCenter = target:WorldSpaceCenter()
+    local okE, eyePos = pcall(function() return bot.ply:EyePos() end)
+    local okH, targetHead = pcall(function() return target:EyePos() end)
+    local okC, targetCenter = pcall(function() return target:WorldSpaceCenter() end)
+    if not okE or not eyePos or not okC or not targetCenter then return false end
+    if not okH or not targetHead then targetHead = targetCenter end
 
     -- 1. Проверяем луч в голову
     local trHead = util.TraceLine({
@@ -153,10 +158,14 @@ function GeminiBots.Vision:CanPerceive(bot, target)
     local fov = (cfg and cfg.VisionFOV) or 110
     local inFOV = angle <= (fov / 2)
 
-    hasLOS, hitPos = false, nil
-    if inFOV then
-        hasLOS, hitPos = self:HasLineOfSight(bot, target)
+    -- Трейсы только в конусе — плюс всегда рядом (250): ближнее чутье
+    -- должно работать и за спиной. wallhack форсит уже ПОСЛЕ замера,
+    -- чутье смотрит на честный rawLOS (сквозь стену не чувствуем)
+    local rawLOS, rawPos = false, nil
+    if inFOV or dist <= 250 then
+        rawLOS, rawPos = self:HasLineOfSight(bot, target)
     end
+    local hasLOS, hitPos = rawLOS, rawPos
     if cht and cht.wallhack then
         hasLOS = true
         hitPos = hitPos or targetPos
@@ -195,10 +204,10 @@ function GeminiBots.Vision:CanPerceive(bot, target)
         end
     end
 
-    -- Ближнее чутье: враг вплотную и на прямой видимости — замечаем
-    -- боковым зрением даже вне конуса (зашел за спину — не игнорим).
+    -- Ближнее чутье: враг вплотную и на честной прямой видимости —
+    -- замечаем боковым зрением даже вне конуса (зашел за спину — не игнорим).
     -- Сквозь стену не работает: там только слух выше
-    if hasLOS and dist <= 250 then
+    if rawLOS and dist <= 250 then
         return true, heardSound
     end
 
@@ -341,11 +350,23 @@ function GeminiBots.Vision:FindBestTarget(bot)
     return bestNPC or bestPlayer
 end
 
--- Акустическая реакция на выстрелы: все боты в округе слышат перестрелку и стягиваются
+-- Акустическая реакция на выстрелы: все боты в округе слышат перестрелку и стягиваются.
+-- Чистка кулдаунов ушедших стрелков, чтобы таблица не росла
+hook.Add("EntityRemoved", "GeminiBots_Acoustic_Cleanup", function(ent)
+    if GeminiBots.AcousticCooldown then
+        GeminiBots.AcousticCooldown[ent] = nil
+    end
+end)
+-- Троттл на стрелка: очередь из пулемета иначе перетирает точку каждый выстрел
+GeminiBots.AcousticCooldown = GeminiBots.AcousticCooldown or {}
 hook.Add("EntityFireBullets", "GeminiBots_Acoustic_Gunfire", function(entity, data)
     if not IsValid(entity) then return end
-    local shooterPos = entity:GetPos()
     local cfg = GeminiBots.Config
+    if not cfg or not cfg.Enabled then return end
+    local now = CurTime()
+    if (GeminiBots.AcousticCooldown[entity] or 0) > now then return end
+    GeminiBots.AcousticCooldown[entity] = now + 0.5
+    local shooterPos = entity:GetPos()
     local gunRange = (cfg and cfg.GunHearingRange) or 3000
 
     for _, bot in pairs(GeminiBots:GetAllBots()) do
@@ -355,12 +376,14 @@ hook.Add("EntityFireBullets", "GeminiBots_Acoustic_Gunfire", function(entity, da
             if GeminiBots.Vision:IsValidTarget(bot, entity) then
                 local dist = bot.ply:GetPos():Distance(shooterPos)
                 if dist <= gunRange then
-                    -- Вне боя: слышит стрельбу и идет на звук
+                    -- Вне боя: слышит стрельбу и идет на звук.
+                    -- Разворот только yaw (см. баг pitch в скане)
                     if bot.state == "idle" or bot.state == "wander" then
                         bot.investigatePos = shooterPos + Vector(math.Rand(-80, 80), math.Rand(-80, 80), 0)
                         bot.investigateTime = CurTime()
                         bot.investigateKind = "gunfire"
-                        bot.desiredViewAngles = (shooterPos - bot.ply:EyePos()):Angle()
+                        local yawTo = (shooterPos - bot.ply:EyePos()):Angle().y
+                        bot.desiredViewAngles = Angle(0, yawTo, 0)
                         GeminiBots.FSM:SetState(bot, "wander")
                     end
                 end

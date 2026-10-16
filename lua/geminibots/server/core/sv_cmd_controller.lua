@@ -12,6 +12,12 @@ local function ApproachAngle(current, target, maxStep)
     return current + math.Clamp(diff, -maxStep, maxStep)
 end
 
+-- Один битый угол заражает current навсегда: NaN-гард с откатом
+local function SafeAngle(v, fallback)
+    if v ~= v then return fallback end
+    return v
+end
+
 -- Сглаживание направления взгляда: один кламп-шаг к цели за тик.
 -- Второго Lerp назад нет (давал скорость в разы ниже aimSpeed
 -- и вечное "почти навелся")
@@ -24,12 +30,16 @@ function GeminiBots.Controller:SmoothAngles(bot, current, desired, dt)
 
     local p = ApproachAngle(current.p, desired.p, maxStep)
     local y = ApproachAngle(current.y, desired.y, maxStep)
+    p, y = SafeAngle(p, current.p), SafeAngle(y, current.y)
 
     return Angle(math.Clamp(p, -89, 89), math.NormalizeAngle(y), 0)
 end
 
--- Проверка взаимодействия с дверями перед ботом
-local function CheckDoorInteraction(ply, cmd)
+-- Проверка взаимодействия с дверями перед ботом.
+-- Трейс каждый 3-й тик бота (20 Гц хватает за глаза, было 60)
+local function CheckDoorInteraction(ply, cmd, bot)
+    bot.doorTick = (bot.doorTick or 0) + 1
+    if bot.doorTick % 3 ~= 0 then return end
     local doorRange = (GeminiBots.Config and GeminiBots.Config.DoorInteractionRange) or 65
     local tr = util.TraceLine({
         start = ply:EyePos(),
@@ -87,7 +97,7 @@ hook.Add("StartCommand", "GeminiBots_StartCommand_Controller", function(ply, cmd
     cmd:SetButtons(bot.buttons or 0)
 
     -- 4. Автоматическое открытие дверей
-    CheckDoorInteraction(ply, cmd)
+    CheckDoorInteraction(ply, cmd, bot)
 
     -- 5. Автопрыжок при утыкании в небольшое препятствие
     if (bot.forwardMove or 0) > 50 and ply:IsOnGround() then

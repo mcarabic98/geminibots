@@ -17,19 +17,20 @@ function GeminiBots.Memory:Update(bot)
         bot.targetLostTime = 0
         return
     end
-    -- Alive есть не у всех сущностей (NPC/SENT): через pcall, иначе
-    -- ошибка тика заморозит бота с протухшей целью
+    -- Alive есть не у всех сущностей: не смогли проверить — считаем живым
+    -- (иначе NPC без метода сбрасывался бы каждый тик и его нельзя добить)
     local okAlive, alive = pcall(function() return target:Alive() end)
-    if not okAlive or not alive then
+    if okAlive and not alive then
         bot.target = nil
         bot.lastKnownTargetPos = nil
         bot.targetLostTime = 0
         return
     end
 
-    -- Цель стала невалидной (ушел в спектаторы/ноклип, смена команды):
-    -- забываем сразу, а не держим бой с призраком
-    if not GeminiBots.Vision:IsValidTarget(bot, target) then
+    -- Цель стала невалидной (ушел в спектаторы/ноклип, смена команды
+    -- или режима целей): забываем сразу, а не держим бой с призраком
+    if not GeminiBots.Vision:IsValidTarget(bot, target)
+        or not GeminiBots.Vision:CanTargetClass(bot, target) then
         bot.target = nil
         bot.lastKnownTargetPos = nil
         bot.targetLostTime = 0
@@ -104,9 +105,14 @@ hook.Add("EntityTakeDamage", "GeminiBots_Memory_OnTakeDamage", function(target, 
             bot.lastKnownTargetPos = attacker:GetPos()
             bot.targetLostTime = 0
 
-            -- Поворачиваемся в сторону обидчика
-            local dir = (attacker:EyePos() - target:EyePos()):Angle()
-            bot.desiredViewAngles = Angle(dir.p, dir.y, 0)
+            -- Поворачиваемся в сторону обидчика (только yaw: разворот
+            -- к ногам накоротке клал pitch, тот же баг что в скане)
+            local okD, dir = pcall(function()
+                return (attacker:EyePos() - target:EyePos()):Angle()
+            end)
+            if okD and dir then
+                bot.desiredViewAngles = Angle(0, dir.y, 0)
+            end
 
             -- Переключаем в боевое состояние
             if GeminiBots.FSM and GeminiBots.FSM.SetState then
