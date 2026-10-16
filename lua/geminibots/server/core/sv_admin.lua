@@ -60,6 +60,18 @@ concommand.Add("geminibots_bot_aim", function(ply, _, args)
     else
         add("цель: нет")
     end
+    -- Живой пересчет прицела тем же кодом, что бой: совпал с desired —
+    -- виноват расчет, нет — desired ставит кто-то другой (или stale)
+    if IsValid(tgt) and GeminiBots.Aiming then
+        local okC, live = pcall(function()
+            return GeminiBots.Aiming:CalculateAimAngles(bot, tgt)
+        end)
+        add(string.format("liveAim=%s lastAim=%s break=%s(%s)",
+            (okC and live) and tostring(live) or ("ERR:" .. tostring(live)),
+            bot.lastAimAngles and tostring(bot.lastAimAngles) or "nil",
+            tostring(IsValid(bot.breakEnt) and bot.breakEnt:GetClass() or nil),
+            tostring(bot.breakUntil or 0)))
+    end
     local wep = target:GetActiveWeapon()
     add(string.format("пушка=%s кнопки=%s move=%d/%d путь=%s",
         IsValid(wep) and wep:GetClass() or "-",
