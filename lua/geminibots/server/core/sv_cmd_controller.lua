@@ -63,7 +63,11 @@ hook.Add("StartCommand", "GeminiBots_StartCommand_Controller", function(ply, cmd
     local dt = FrameTime()
     if dt <= 0 then dt = 0.015 end
 
-    -- 1. Сглаживание и установка углов обзора
+    -- 1. Сглаживание и установка углов обзора.
+    -- cmd:SetViewAngles у ботов движок игнорирует (движение из того же cmd
+    -- применяется, а взгляд застывает с респауна — доказано зондом
+    -- geminibots_bot_aim: current сошелся с desired, eye не двинулся).
+    -- Поэтому ставим взгляд напрямую, как делают боты HL2DM
     bot.currentViewAngles = GeminiBots.Controller:SmoothAngles(
         bot,
         bot.currentViewAngles or ply:EyeAngles(),
@@ -72,6 +76,7 @@ hook.Add("StartCommand", "GeminiBots_StartCommand_Controller", function(ply, cmd
     )
 
     cmd:SetViewAngles(bot.currentViewAngles)
+    ply:SetEyeAngles(bot.currentViewAngles)
 
     -- 2. Применение движений (ForwardMove / SideMove / UpMove)
     cmd:SetForwardMove(bot.forwardMove or 0)
