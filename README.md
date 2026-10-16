@@ -22,7 +22,7 @@
 
 ## Установка
 
-1. Папку `geminibots` — в `GarrysMod/garrysmod/addons/` (для разработки удобнее `deploy_to_gmod.bat` — зеркалит проект через `robocopy /MIR`).
+1. Папку `geminibots` — в `GarrysMod/garrysmod/addons/` (для разработки удобнее `tools/deploy_to_gmod.bat` — зеркалит проект через `robocopy /MIR`).
 2. Запусти карту. Нет навмеша — админу через 10 сек предложат сгенерировать (`nav_generate` вручную тоже работает, сервер подвиснет на минуты).
 3. В консоль (`~`):
    ```console
@@ -52,6 +52,6 @@
 | [docs/CHAT.md](docs/CHAT.md) | Паки фраз, формат, события, дуэли |
 | [docs/COMPAT.md](docs/COMPAT.md) | SWCS, C4, Murder, HL2-детматч, NPC-базы |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Структура проекта, свои FSM-состояния, разработка |
-| [CHANGELOG.md](CHANGELOG.md) | История изменений |
-| [BUGS.md](BUGS.md) | Баги, чинившиеся не с первого раза |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | История изменений |
+| [docs/BUGS.md](docs/BUGS.md) | Баги, чинившиеся не с первого раза |
 | [README_EN.md](README_EN.md) | English version |

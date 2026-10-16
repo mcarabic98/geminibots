@@ -22,7 +22,7 @@ Details (in Russian for now): `docs/` — see [README.md](README.md) for the ind
 
 ## Install
 
-1. Copy `geminibots` to `GarrysMod/garrysmod/addons/` (developers: `deploy_to_gmod.bat` mirrors the project via `robocopy /MIR`).
+1. Copy `geminibots` to `GarrysMod/garrysmod/addons/` (developers: `tools/deploy_to_gmod.bat` mirrors the project via `robocopy /MIR`).
 2. Start a map. No navmesh — an admin gets a generate offer 10 seconds after load (`nav_generate` by hand works too; the server freezes for minutes).
 3. Console (`~`):
    ```console
