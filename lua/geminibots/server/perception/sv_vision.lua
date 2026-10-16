@@ -246,10 +246,11 @@ function GeminiBots.Vision:FindBestTarget(bot)
         return nil
     end
 
-    -- Кандидаты: игроки + NPC в радиусе зрения (по режиму целей)
+    -- Кандидаты: игроки + NPC в радиусе зрения (по режиму целей).
+    -- Игроки — из полусекундного кэша, а не GetAll каждый скан
     local candidates = {}
     if wantPlayers then
-        for _, ply in ipairs(player.GetAll()) do
+        for _, ply in ipairs(GeminiBots:AllPlayersCached()) do
             table.insert(candidates, ply)
         end
     end

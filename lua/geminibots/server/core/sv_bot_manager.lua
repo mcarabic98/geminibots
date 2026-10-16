@@ -86,6 +86,20 @@ function GeminiBots:GetAllBots()
     return self.Bots
 end
 
+-- Все игроки одним списком: player.GetAll каждый скан каждого бота —
+-- дорого, раз в полсекунды хватает (заход/выход с задержкой незаметны)
+GeminiBots.PlayersCache = GeminiBots.PlayersCache or {}
+GeminiBots.PlayersCacheAt = GeminiBots.PlayersCacheAt or -99
+
+function GeminiBots:AllPlayersCached()
+    local now = CurTime()
+    if (self.PlayersCacheAt or -99) + 0.5 < now or not self.PlayersCache then
+        self.PlayersCache = player.GetAll()
+        self.PlayersCacheAt = now
+    end
+    return self.PlayersCache
+end
+
 -- Сброс состояния бота (при возрождении)
 function GeminiBots:ResetBot(ply)
     local bot = self:GetBot(ply)

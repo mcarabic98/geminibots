@@ -45,17 +45,15 @@ function GeminiBots.NPCAdapters:Find(class)
 end
 
 -- Сущность считается NPC-целью: штатные NPC, NextBot'ы (DrGBase и др.),
--- либо класс из префиксов адаптера
+-- либо класс из префиксов адаптера.
+-- Без pcall: IsPlayer/IsNPC/IsNextBot/GetClass — нативные методы движка,
+-- есть у каждой сущности. pcall в горячем цикле — дорогой, а ловить нечего
 function GeminiBots.NPCAdapters:IsNPCEntity(ent)
     if not IsValid(ent) then return false end
     if ent:IsPlayer() then return false end
-    local okNPC, isNPC = pcall(function() return ent:IsNPC() end)
-    if okNPC and isNPC then return true end
-    local okNB, isNB = pcall(function() return ent:IsNextBot() end)
-    if okNB and isNB then return true end
-    local cls = nil
-    pcall(function() cls = ent:GetClass() end)
-    return self:Find(cls or "") ~= nil
+    if ent:IsNPC() then return true end
+    if ent:IsNextBot() then return true end
+    return self:Find(ent:GetClass() or "") ~= nil
 end
 
 -- Generic: живой и не мертвый. Адаптер может уточнить (своих пропускаем)

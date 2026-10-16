@@ -231,10 +231,11 @@ function GeminiBots.Nav:GetHuntPos(bot)
     local mode = GeminiBots.Config and GeminiBots.Config.Targeting
         and GeminiBots.Config.Targeting.Mode or "both"
 
-    -- Ищем живых врагов по режиму целей: игроки и/или NPC
+    -- Ищем живых врагов по режиму целей: игроки и/или NPC.
+    -- Игроки — из полусекундного кэша, охота строится каждый вход в wander
     local enemies = {}
     if mode ~= "npcs" then
-        for _, ply in ipairs(player.GetAll()) do
+        for _, ply in ipairs(GeminiBots:AllPlayersCached()) do
             if ply ~= bot.ply and ply:Alive()
                 and GeminiBots.Vision:IsValidTarget(bot, ply)
                 and GeminiBots.Vision:CanTargetClass(bot, ply) then
