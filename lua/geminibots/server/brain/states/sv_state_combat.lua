@@ -33,9 +33,12 @@ function State:Update(bot, dt)
     end
 
     -- 3. Если цель скрылась из виду, но мы помним ее последнюю позицию:
-    -- сначала пробуем прострел (стекло/хрупкое + свежий след), иначе разведка
+    -- сначала пробуем прострел (стекло/хрупкое + свежий след), иначе разведка.
+    -- Взгляд — на точку потери: иначе бот идет и смотрит в стену
     local hasLOS = GeminiBots.Vision:HasLineOfSight(bot, target)
     if not hasLOS and bot.lastKnownTargetPos then
+        local lookPos = bot.lastKnownTargetPos + Vector(0, 0, 45)
+        bot.desiredViewAngles = (lookPos - ply:EyePos()):Angle()
         if GeminiBots.Combat:TryWallbang(bot, target) then
             return
         end

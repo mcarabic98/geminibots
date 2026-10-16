@@ -141,11 +141,13 @@ local function ScoreWeapon(class, dist, clip, bot)
     local lower = string.lower(class)
     local boomKind = GeminiBots.WeaponSelector:ExplosiveKind(class)
 
-    -- Утилиты не оружие: физган/тулган/камера в бою не стреляют,
-    -- иначе бот "дерется" гравипушкой и молчит
+    -- Утилиты не оружие: физган/тулганы/камеры в бою не стреляют,
+    -- иначе бот "дерется" гравипушкой и молчит.
+    -- gmod_tool отдельно: "toolgun" в нем нет, фильтр бы пропустил
     if string.find(lower, "physcannon", 1, true)
         or string.find(lower, "physgun", 1, true)
         or string.find(lower, "toolgun", 1, true)
+        or string.find(lower, "gmod_tool", 1, true)
         or string.find(lower, "camera", 1, true) then
         return 0
     end
