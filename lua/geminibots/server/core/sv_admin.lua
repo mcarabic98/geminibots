@@ -11,6 +11,65 @@ local function IsAdmin(ply)
     return not IsValid(ply) or ply:IsSuperAdmin() or ply:IsAdmin() or game.SinglePlayer()
 end
 
+-- Зонд наводки и огня: фактические углы, цель и вся цепочка гейтов одним
+-- снимком. Для случаев "смотрит не туда / не стреляет" — прислать вывод
+concommand.Add("geminibots_bot_aim", function(ply, _, args)
+    if not IsAdmin(ply) then return end
+    local function say(s)
+        if IsValid(ply) then ply:PrintMessage(HUD_PRINTCONSOLE, s) else print(s) end
+    end
+    if not args[1] or args[1] == "" then
+        say("Использование: geminibots_bot_aim <ник>")
+        return
+    end
+    local target = GeminiBots.Admin:FindBot(args[1])
+    if not target then say("Бот не найден: " .. args[1]) return end
+    local bot = GeminiBots:GetBot(target)
+    if not bot then say("ИИ не зарегистрирован.") return end
+    local L = {}
+    local function add(s) table.insert(L, s) end
+    add(string.format("=== Наводка: %s (state=%s) ===",
+        target:Nick(), tostring(bot.state)))
+    local des = bot.desiredViewAngles
+    local eye = target:EyeAngles()
+    local cur = bot.currentViewAngles
+    add(string.format("desired=%s eye=%s current=%s",
+        des and tostring(des) or "nil",
+        tostring(eye), cur and tostring(cur) or "nil"))
+    local tgt = bot.target
+    if IsValid(tgt) then
+        local okA, aimPt = pcall(function() return tgt:WorldSpaceCenter() end)
+        if okA and aimPt then
+            local angTo = (aimPt - target:EyePos()):Angle()
+            local dyaw = math.AngleDifference(angTo.y, eye.y)
+            local dpitch = math.AngleDifference(angTo.p, eye.p)
+            add(string.format("цель=%s dist=%d к-цели=%s ошВзгляда=%.1f",
+                tgt:IsPlayer() and tgt:Nick() or tgt:GetClass(),
+                math.floor(target:GetPos():Distance(tgt:GetPos())),
+                tostring(angTo), math.sqrt(dyaw * dyaw + dpitch * dpitch)))
+        end
+        local okL, los = pcall(function()
+            return GeminiBots.Vision:HasLineOfSight(bot, tgt)
+        end)
+        add(string.format("LOS=%s реакция=%s (сейчас %.1f) burst=%s lastOn=%s",
+            tostring(okL and los),
+            tostring(bot.reactionTimer or 0),
+            CurTime(),
+            tostring(bot.nextBurstTime or 0),
+            tostring(bot.lastOnTargetTime or 0)))
+    else
+        add("цель: нет")
+    end
+    local wep = target:GetActiveWeapon()
+    add(string.format("пушка=%s кнопки=%s move=%d/%d путь=%s",
+        IsValid(wep) and wep:GetClass() or "-",
+        tostring(bot.buttons or 0),
+        math.floor(bot.forwardMove or 0), math.floor(bot.sideMove or 0),
+        bot.path and ("узел " .. tostring(bot.pathIndex) .. "/" .. tostring(#bot.path)) or "нет"))
+    for _, line in ipairs(L) do say(line) end
+    if IsValid(ply) then ply:ChatPrint("[GeminiBots] Замер в консоли (F10).") end
+end, nil, "Замер наводки и огня бота: geminibots_bot_aim <ник>")
+
 -- Найти бота по нику (кастомному или стандартному): точное > префикс > подстрока
 function GeminiBots.Admin:FindBot(query)
     if not query or query == "" then return nil end
