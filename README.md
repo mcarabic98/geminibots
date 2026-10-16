@@ -49,6 +49,7 @@
 | [docs/CONFIG.md](docs/CONFIG.md) | Все конвары и команды |
 | [docs/MENU.md](docs/MENU.md) | Окно настроек, тема, язык, ESP |
 | [docs/WEAPONS.md](docs/WEAPONS.md) | Арсенал, `weapons.txt`, адаптеры паков, подбор с карты |
+| [docs/TESTING.md](docs/TESTING.md) | Чеклист проверки стрельбы |
 | [docs/CHAT.md](docs/CHAT.md) | Паки фраз, формат, события, дуэли |
 | [docs/COMPAT.md](docs/COMPAT.md) | SWCS, C4, Murder, HL2-детматч, NPC-базы |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Структура проекта, свои FSM-состояния, разработка |
