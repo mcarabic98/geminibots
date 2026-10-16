@@ -52,7 +52,7 @@ return State
 
 ## Проверка синтаксиса
 
-Стоковый Lua 5.1 (берется с lua.org, нужны `lua`/`luac`): `continue` из GLua гасится предобработкой, скрипт лежит в репозитории:
+Стоковый Lua 5.1 (берется с lua.org, нужны `lua`/`luac`): `continue` из GLua гасится предобработкой, скрипт — локальный `tools/check_syntax.lua` (папка `tools/` только для разработки, в гит не едет):
 ```console
 lua tools/check_syntax.lua
 ```

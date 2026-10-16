@@ -9,3 +9,6 @@ data/geminibots/weapon_dump.txt
 data/geminibots/logs/
 data/geminibots/chat/
 data/geminibots/states/
+
+# Local dev helpers, never commit
+tools/
