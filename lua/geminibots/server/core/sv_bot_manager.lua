@@ -139,6 +139,7 @@ function GeminiBots:ResetBot(ply)
         bot.bhopSkip = false
         bot.crouchUntil = 0
         bot.keepLookUntil = 0
+        bot.peekWindow = CurTime()
         bot.nextScanTime = 0
         bot.reactionTimer = 0
         bot.nextBurstTime = 0

@@ -33,9 +33,9 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
     if bot.aimTarget ~= target or CurTime() - (bot.aimRollTime or 0) > 2 then
         bot.aimTarget = target
         bot.aimRollTime = CurTime()
-        local hs = GeminiBots.BotAim(bot).headshot
-        bot.aimHead = math.random() <= (hs or 0.35)
-        local sp = GeminiBots.BotAim(bot).spread or 0
+        local am = GeminiBots.BotAim(bot)
+        bot.aimHead = math.random() <= (am.headshot or 0.35)
+        local sp = am.spread or 0
         bot.aimSpreadP = math.Rand(-sp, sp) * 0.5
         bot.aimSpreadY = math.Rand(-sp, sp) * 0.5
     end
@@ -53,12 +53,17 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
 
     -- 2. Упреждение движения цели (Lead Aim).
     -- Только горизонталь: прыжок цели иначе уводит точку в небо.
+    -- Хитскан мгновенный: целим в текущую точку, а не с упреждением
+    -- (на 2500 юнитов упреждение давало ~200 мимо по стрейфу).
     -- Плоское: прыжки не предсказываем
     if cfg and cfg.AimPrediction then
         local dist = eyePos:Distance(aimPos)
         local activeWep = bot.ply:GetActiveWeapon()
         local projectileSpeed = self:ProjectileSpeed(IsValid(activeWep) and activeWep:GetClass() or "")
-        local timeToHit = dist / projectileSpeed
+        local timeToHit = 0
+        if projectileSpeed < 6000 then
+            timeToHit = dist / projectileSpeed
+        end
 
         local targetVel = target:GetVelocity()
         targetVel.z = 0
@@ -120,8 +125,11 @@ function GeminiBots.Aiming:CalculateLobAngles(bot, targetPos, throwSpeed)
     local disc = v2 * v2 - g * (g * dx * dx + 2 * dy * v2)
 
     local pitch
+    local landed = nil
     if disc <= 0 then
-        pitch = math.rad(45) -- Не долетит: кидаем на максимальную дальность
+        -- Не долетит (цель выше под балконом): точки падения нет,
+        -- гейт в бою такой бросок придержит
+        pitch = math.rad(45)
     else
         pitch = math.atan((v2 - math.sqrt(disc)) / (g * dx))
     end
@@ -132,9 +140,9 @@ function GeminiBots.Aiming:CalculateLobAngles(bot, targetPos, throwSpeed)
 
     -- Симуляция полета для проверки точки падения и дебаг-отрисовки
     local points = self:PredictThrowPoints(eyePos, angles, v, targetPos.z)
-    local landing = points[#points]
+    if disc > 0 then landed = points[#points] end
 
-    return angles, landing, points
+    return angles, landed, points
 end
 
 -- Чистая симуляция полета гранаты: старт, углы, скорость -> точки дуги.

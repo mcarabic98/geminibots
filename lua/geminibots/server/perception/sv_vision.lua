@@ -138,6 +138,8 @@ function GeminiBots.Vision:CanPerceive(bot, target)
     local dist = eyePos:Distance(targetPos)
     local maxRange = (cfg and cfg.VisionRange) or 2500
     if dist > maxRange then return false, false end
+    -- В упор (дыхание в лицо) — видит всегда, без конусов и трейсов
+    if dist < 1 then return true, true end
 
     local hasLOS, hitPos = false, nil
 
@@ -236,10 +238,12 @@ function GeminiBots.Vision:FindBestTarget(bot)
 
     -- Дуэль: дерется только с вызвавшим. Видит — атакует, слышит — идет
     -- на звук, не видит — остальных игнорирует (возврат nil).
+    -- Смена режима целей дуэль прерывает (класс противника запрещен)
     local duel = GeminiBots.Duels and GeminiBots.Duels[bot.ply] or nil
     if duel then
         if not IsValid(duel.enemy) or not duel.enemy:Alive()
-            or (duel.since and CurTime() - duel.since > 180) then
+            or (duel.since and CurTime() - duel.since > 180)
+            or not self:CanTargetClass(bot, duel.enemy) then
             GeminiBots.Duels[bot.ply] = nil
             duel = nil
         end
@@ -278,7 +282,7 @@ function GeminiBots.Vision:FindBestTarget(bot)
         local pool = (GeminiBots.NPCAdapters and GeminiBots.NPCAdapters:AllNPCs())
             or ents.FindByClass("npc_*")
         for _, npc in ipairs(pool) do
-            if IsValid(npc) and botPos:Distance(npc:GetPos()) <= range then
+            if IsValid(npc) and botPos:DistToSqr(npc:GetPos()) <= range * range then
                 table.insert(candidates, npc)
             end
         end
@@ -328,11 +332,16 @@ function GeminiBots.Vision:FindBestTarget(bot)
 
                 -- Гулял или стоял: поворачиваемся к источнику шума.
                 -- Только по горизонтали: разворот к ногам (GetPos) накоротке
-                -- давал pitch под -89 и вечную петлю "слышу ноги, вижу ноги"
+                -- давал pitch под -89 и вечную петлю "слышу ноги, вижу ноги".
+                -- Не дергаем FSM каждый скан: свежий путь не перестраиваем,
+                -- пока точка не ушла дальше 200
                 if bot.state == "idle" or bot.state == "wander" then
                     local yawTo = (ent:GetPos() - bot.ply:EyePos()):Angle().y
                     bot.desiredViewAngles = Angle(0, yawTo, 0)
-                    GeminiBots.FSM:SetState(bot, "wander")
+                    if bot.state ~= "wander" or not bot.pathTargetPos
+                        or bot.pathTargetPos:Distance(ent:GetPos()) > 200 then
+                        GeminiBots.FSM:SetState(bot, "wander")
+                    end
                 end
             end
         end

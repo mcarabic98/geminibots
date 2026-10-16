@@ -228,17 +228,19 @@ function GeminiBots.Combat:Update(bot, dt)
         end
 
         -- Граната: кидаем, только если расчетная точка падения рядом с целью
-        -- (иначе полетит в потолок или за спину)
-        if not holdFire and boomKind == "frag" and lobLanding and IsValid(target) then
-            if lobLanding:Distance(target:GetPos()) > 250 then
+        -- (иначе полетит в потолок или за спину; точки нет вообще —
+        -- не долетит в принципе, тоже держим)
+        if not holdFire and boomKind == "frag" and IsValid(target) then
+            if not lobLanding or lobLanding:Distance(target:GetPos()) > 250 then
                 holdFire = true
             end
         end
     end
 
-    -- Тактика без готовой точки/кулдауна — не кидаем, сразу меняем пушку
+    -- Тактика без готовой точки/кулдауна — не кидаем, сразу меняем пушку.
+    -- Точки падения нет (не долетит) — тоже не кидаем
     if adapterKind == "tactical"
-        and (not tacticPointOk or CurTime() < (bot.nextTacticalTime or 0)) then
+        and (not tacticPointOk or not lobLanding or CurTime() < (bot.nextTacticalTime or 0)) then
         holdFire = true
         if CurTime() > (bot.nextUrgentEval or 0) then
             bot.nextWeaponEvalTime = 0
