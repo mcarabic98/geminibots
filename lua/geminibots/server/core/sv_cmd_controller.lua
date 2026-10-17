@@ -102,13 +102,16 @@ hook.Add("StartCommand", "GeminiBots_StartCommand_Controller", function(ply, cmd
             tdist = math.floor(ep:Distance(tp))
             tdz = math.floor(tp.z - ep.z)
         end
-        print(string.format(
+        local line = string.format(
             "[GeminiBots][look] %s state=%s src=%s des=%.0f/%.0f cur=%.0f/%.0f цель=%s dist=%d dz=%d",
             ply:Nick(), tostring(bot.state), tostring(bot.viewSrc),
             bot.desiredViewAngles and bot.desiredViewAngles.p or 0,
             bot.desiredViewAngles and bot.desiredViewAngles.y or 0,
             bot.currentViewAngles.p, bot.currentViewAngles.y,
-            tdesc, tdist, tdz))
+            tdesc, tdist, tdz)
+        print(line)
+        -- Дублируем в клиентские консоли (F10): на listen-сервере print видно не везде
+        PrintMessage(HUD_PRINTCONSOLE, line)
     end
 
     -- 2. Применение движений (ForwardMove / SideMove / UpMove)
