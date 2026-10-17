@@ -35,6 +35,7 @@ local CONVAR_DEFS = {
     { "geminibots_loadout_max", "3", "Максимальное количество выдаваемых оружий (1-5)" },
     { "geminibots_loadout_strip", "1", "Очищать дефолтное оружие перед выдачей (вкл/выкл)" },
     { "geminibots_loadout_ammo", "180", "Количество выдаваемых патронов для каждого оружия" },
+    { "geminibots_loadout_smart", "1", "Умный лоадаут: не более одной гранаты/тактики и минимум один стреляющий ствол (вкл/выкл)" },
 
     -- Чат (Chat)
     { "geminibots_chat_enabled", "1", "Разрешить ботам писать в чат (вкл/выкл)" },
@@ -119,6 +120,7 @@ function GeminiBots:SyncConfigFromConVars()
         cfg.Loadout.MaxWeapons = math.Clamp(GetConVar("geminibots_loadout_max"):GetInt(), cfg.Loadout.MinWeapons, 10)
         cfg.Loadout.StripDefaultWeapons = GetConVar("geminibots_loadout_strip"):GetBool()
         cfg.Loadout.AmmoAmount = GetConVar("geminibots_loadout_ammo"):GetInt()
+        cfg.Loadout.SmartLoadout = GetConVar("geminibots_loadout_smart"):GetBool()
     end
 
     if cfg.Chat then

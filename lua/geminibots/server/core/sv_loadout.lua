@@ -709,6 +709,93 @@ local function ShuffleTable(tbl)
     end
 end
 
+-- Роль оружия для умного лоадаута (по типу из GetWeaponType)
+local ROLE_OF_TYPE = {
+    rifle = "primary", smg = "primary", shotgun = "primary",
+    sniper = "primary", mg = "primary",
+    pistol = "secondary",
+    grenade = "frag",
+    tactical = "tactical",
+    melee = "melee",
+}
+-- Порядок предпочтения и лимит единиц на роль: граната/тактика/мили — по
+-- одной, стволов можно пару. special/other (ловушки, тазер) не берем вообще
+local ROLE_ORDER = { "primary", "secondary", "frag", "tactical", "melee" }
+local ROLE_CAP = { primary = 2, secondary = 2, frag = 1, tactical = 1, melee = 1 }
+
+local function RoleOf(class)
+    return ROLE_OF_TYPE[GeminiBots.Loadout:GetWeaponType(class)] or "other"
+end
+
+-- Умный подбор: ровно wantCount единиц, но без дублей гранат/тактики и
+-- обязательно со стреляющим стволом. Возвращает список классов (может быть
+-- пустым — тогда вызывающий падает на прежний случайный выбор)
+local function BuildSmartLoadout(pool, wantCount)
+    local byRole = {}
+    for _, class in ipairs(pool) do
+        local r = RoleOf(class)
+        if r ~= "other" then
+            byRole[r] = byRole[r] or {}
+            table.insert(byRole[r], class)
+        end
+    end
+    for _, list in pairs(byRole) do ShuffleTable(list) end
+
+    local chosen, taken = {}, {}
+    local function take(role)
+        if #chosen >= wantCount then return false end
+        if (taken[role] or 0) >= (ROLE_CAP[role] or 1) then return false end
+        local list = byRole[role]
+        if not list or #list == 0 then return false end
+        local c = table.remove(list, 1)
+        table.insert(chosen, c)
+        taken[role] = (taken[role] or 0) + 1
+        return true
+    end
+
+    -- Сначала по одному на роль, затем добор (второй ствол) до wantCount
+    for _, role in ipairs(ROLE_ORDER) do take(role) end
+    while #chosen < wantCount do
+        local progressed = false
+        for _, role in ipairs(ROLE_ORDER) do
+            if #chosen >= wantCount then break end
+            if take(role) then progressed = true end
+        end
+        if not progressed then break end
+    end
+
+    -- Гарантия стреляющего ствола: одни гранаты/мили — не лоадаут
+    local hasShoot = false
+    for _, c in ipairs(chosen) do
+        local r = RoleOf(c)
+        if r == "primary" or r == "secondary" then hasShoot = true break end
+    end
+    if not hasShoot then
+        local gunRole = ((byRole.primary and #byRole.primary > 0) and "primary")
+            or ((byRole.secondary and #byRole.secondary > 0) and "secondary") or nil
+        if gunRole then
+            local gun = table.remove(byRole[gunRole], 1)
+            if #chosen >= wantCount and #chosen > 0 then table.remove(chosen, 1) end
+            table.insert(chosen, 1, gun)
+        end
+    end
+
+    return chosen
+end
+
+-- Лучший ствол для выбора в руки: primary > secondary > первый
+local function PickActiveClass(givenWeapons)
+    local best = givenWeapons[1]
+    for _, w in ipairs(givenWeapons) do
+        if IsValid(w) then
+            local r = RoleOf(w:GetClass())
+            if r == "primary" then return w:GetClass() end
+            if r == "secondary" then best = w end
+        end
+    end
+    return IsValid(best) and best:GetClass() or nil
+end
+
 -- Выдать боту случайный набор оружия из активного пула
 function GeminiBots.Loadout:EquipBot(ply)
     if not IsValid(ply) or not ply:IsBot() then return end
@@ -732,16 +819,27 @@ function GeminiBots.Loadout:EquipBot(ply)
     if #pool == 0 then return end
 
     local available = table.Copy(pool)
-    ShuffleTable(available)
 
     local minWeps = math.Clamp(cfg.MinWeapons or 1, 1, #available)
     local maxWeps = math.Clamp(cfg.MaxWeapons or 3, minWeps, #available)
     local countToGive = math.random(minWeps, maxWeps)
 
+    -- Умный подбор: не более одной гранаты/тактики/рукопашки и хотя бы один
+    -- стреляющий ствол. Пул ролево бедный (одни гранаты) — прежний случайный
+    local picks
+    if cfg.SmartLoadout ~= false then
+        picks = BuildSmartLoadout(available, countToGive)
+    end
+    if not picks or #picks == 0 then
+        ShuffleTable(available)
+        picks = {}
+        for i = 1, countToGive do picks[i] = available[i] end
+    end
+
     local givenWeapons = {}
 
-    for i = 1, countToGive do
-        local wepClass = available[i]
+    for _, wepClass in ipairs(picks) do
+        if not wepClass then break end
         local wep = self:SafeGive(ply, wepClass)
 
         if IsValid(wep) then
@@ -776,8 +874,9 @@ function GeminiBots.Loadout:EquipBot(ply)
     end
 
     if #givenWeapons > 0 then
-        local firstWep = givenWeapons[1]
-        ply:SelectWeapon(firstWep:GetClass())
+        -- В руки — стреляющий ствол (primary > secondary), не граната/нож
+        local activeClass = PickActiveClass(givenWeapons)
+        if activeClass then ply:SelectWeapon(activeClass) end
     end
 
     GeminiBots:Debug("Боту %s выдано %d единиц оружия.", ply:Nick(), #givenWeapons)

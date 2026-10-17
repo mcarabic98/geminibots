@@ -6,6 +6,18 @@
 GeminiBots = GeminiBots or {}
 GeminiBots.Vision = GeminiBots.Vision or {}
 
+-- Дым SWCS (если аддон стоит): облако рвет линию видимости. Движок о дыме
+-- не знает, поэтому спрашиваем сам SWCS (свой радиус 166 и центр облака,
+-- учитывает chord — насколько глубоко луч режет облако). Вне SWCS или без
+-- активных шашек — сразу false, дешево. Работает и «из дыма наружу» (луч
+-- начинается внутри облака -> блок)
+local function IsSmokeBlocked(from, to)
+    if not swcs or not swcs.IsLineBlockedBySmoke or not swcs._SmokeGrenades then
+        return false
+    end
+    return swcs.IsLineBlockedBySmoke(from, to, 1) == true
+end
+
 -- Проверка валидности потенциальной цели
 function GeminiBots.Vision:IsValidTarget(bot, ent)
     if not bot or not IsValid(bot.ply) then return false end
@@ -88,7 +100,9 @@ function GeminiBots.Vision:HasLineOfSight(bot, target)
     })
 
     if trHead.Entity == target or trHead.Fraction >= 0.98 then
-        return true, targetHead
+        if not IsSmokeBlocked(eyePos, targetHead) then
+            return true, targetHead
+        end
     end
 
     -- 2. Если голова перекрыта, проверяем центр туловища
@@ -100,7 +114,9 @@ function GeminiBots.Vision:HasLineOfSight(bot, target)
     })
 
     if trCenter.Entity == target or trCenter.Fraction >= 0.98 then
-        return true, targetCenter
+        if not IsSmokeBlocked(eyePos, targetCenter) then
+            return true, targetCenter
+        end
     end
 
     return false, nil
