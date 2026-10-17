@@ -141,6 +141,8 @@ function GeminiBots:ResetBot(ply)
         bot.keepLookUntil = 0
         bot.peekWindow = CurTime()
         bot.nextScanTime = 0
+        bot.fleeLockUntil = 0
+        bot.aimNaNWarn = 0
         bot.reactionTimer = 0
         bot.nextBurstTime = 0
         bot.nextWeaponEvalTime = 0

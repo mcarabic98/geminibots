@@ -78,11 +78,27 @@ function State:Update(bot, dt)
 
     -- По истечении времени отступления или если добежали до точки
     if not bot.path or CurTime() >= (bot.stateData.timeout or 0) then
-        -- Если враг потерян из виду, возвращаемся в спокойное состояние
+        local ply = bot.ply
+        local cfg = GeminiBots.Config
+        local threshold = (cfg and cfg.FleeHealthThreshold) or 0.25
+        local critical = (ply:Health() / math.max(1, ply:GetMaxHealth())) <= threshold
+
+        -- Здоровье все еще критично: не ныряем обратно в бой, иначе
+        -- combat->flee->combat крутится вечно (flee не лечит). Отступаем
+        -- повторно, но не бесконечно: 2 отступа, дальше деремся с кулдауном
+        if critical and (bot.stateData.repeats or 0) < 2 then
+            bot.stateData.repeats = (bot.stateData.repeats or 0) + 1
+            self:Enter(bot)
+            return
+        end
+
+        -- Кулдаун: бой не отправит в flee ближайшие 6 сек — петля рвется
+        bot.fleeLockUntil = CurTime() + 6
+
         if not IsValid(bot.target) or not GeminiBots.Vision:HasLineOfSight(bot, bot.target) then
             GeminiBots.FSM:SetState(bot, "idle")
         else
-            -- Если враг все еще преследует, принимаем последний бой
+            -- Враг все еще преследует, а бежать больше некуда: принимаем бой
             GeminiBots.FSM:SetState(bot, "combat")
         end
     end

@@ -17,9 +17,12 @@ function State:Update(bot, dt)
     -- Murder: безоружный мирный при известном убийце рядом — бежать, а не драться
     if GeminiBots.MurderFleeCheck and GeminiBots.MurderFleeCheck(bot) then return end
 
-    -- 1. Проверка здоровья: если здоровье критически мало, пытаемся отступить
+    -- 1. Проверка здоровья: если здоровье критически мало, пытаемся отступить.
+    -- Кулдаун fleeLockUntil рвет вечную петлю combat->flee->combat при
+    -- низком HP (flee не лечит, без кулдауна бот мигает состояниями)
     local fleeThreshold = (cfg and cfg.FleeHealthThreshold) or 0.25
-    if (ply:Health() / ply:GetMaxHealth()) <= fleeThreshold then
+    if (ply:Health() / ply:GetMaxHealth()) <= fleeThreshold
+        and CurTime() >= (bot.fleeLockUntil or 0) then
         GeminiBots.FSM:SetState(bot, "flee")
         return
     end

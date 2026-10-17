@@ -35,7 +35,10 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         bot.aimRollTime = CurTime()
         local am = GeminiBots.BotAim(bot)
         bot.aimHead = math.random() <= (am.headshot or 0.35)
+        -- Разброс тоже может прийти битым (NaN/отрицательный): math.Rand(NaN,..)
+        -- заражал прицел NaN-ом, а math.Clamp(NaN,-89,89) потом возвращает 89
         local sp = am.spread or 0
+        if sp ~= sp or sp < 0 then sp = 0 end
         bot.aimSpreadP = math.Rand(-sp, sp) * 0.5
         bot.aimSpreadY = math.Rand(-sp, sp) * 0.5
     end
@@ -65,7 +68,13 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
             timeToHit = dist / projectileSpeed
         end
 
+        -- Скорость цели тоже бывает битой (NaN из физики): NaN * 0 = NaN,
+        -- поэтому при хитскане (timeToHit = 0) заражение все равно проходило
         local targetVel = target:GetVelocity()
+        if targetVel.x ~= targetVel.x or targetVel.y ~= targetVel.y
+            or targetVel.z ~= targetVel.z then
+            targetVel = Vector(0, 0, 0)
+        end
         targetVel.z = 0
         aimPos = aimPos + targetVel * timeToHit
     end
@@ -83,6 +92,26 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
     if spreadP ~= 0 or spreadY ~= 0 then
         aimAngle.p = math.Clamp(aimAngle.p + spreadP, -89, 89)
         aimAngle.y = math.NormalizeAngle(aimAngle.y + spreadY)
+    end
+
+    -- NaN-страховка. math.Clamp(NaN, -89, 89) в GMod возвращает 89, а
+    -- NormalizeAngle(NaN) оставляет yaw — бот застывал «смотрит в пол 89
+    -- при верном yaw». Ловим заражение и целимся прямо в центр цели
+    if aimAngle.p ~= aimAngle.p or aimAngle.y ~= aimAngle.y then
+        if CurTime() >= (bot.aimNaNWarn or 0) then
+            bot.aimNaNWarn = CurTime() + 5
+            local v = target:GetVelocity()
+            print(string.format(
+                "[GeminiBots][aimNaN] %s spread=(%s,%s) vel=%s eye=%s wsc=%s",
+                bot.ply:Nick(), tostring(bot.aimSpreadP), tostring(bot.aimSpreadY),
+                tostring(v), tostring(eyePos), tostring(target:WorldSpaceCenter())))
+        end
+        local dir = target:WorldSpaceCenter() - eyePos
+        if dir:LengthSqr() >= 1 and dir.x == dir.x and dir.y == dir.y and dir.z == dir.z then
+            aimAngle = dir:Angle()
+        else
+            aimAngle = bot.lastAimAngles or Angle(0, 0, 0)
+        end
     end
 
     return aimAngle
