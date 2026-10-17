@@ -45,6 +45,15 @@ function State:Enter(bot)
 end
 
 function State:Update(bot, dt)
+    -- Отступление: смотрим по курсу отхода (только yaw). Без этого flee
+    -- не трогает взгляд вообще, и бот бежит с замороженным углом боя
+    -- (бывало и «в пол»)
+    if IsValid(bot.ply) and bot.path and bot.path[bot.pathIndex] then
+        local yaw = (bot.path[bot.pathIndex] - bot.ply:GetPos()):Angle().y
+        bot.desiredViewAngles = Angle(0, math.NormalizeAngle(yaw), 0)
+        bot.viewSrc = "flee"
+    end
+
     -- Бомба рядом: держим дистанцию, пока не рванет или не уйдем далеко
     if bot.fleeBomb ~= nil then
         if IsValid(bot.fleeBomb) then

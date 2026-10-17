@@ -114,6 +114,27 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         end
     end
 
+    -- Страховка от битой точки прицела: у чужих ботов EyePos иногда отдает
+    -- точку почти под ногами, и взгляд падает в пол (pitch 89), хотя в центр
+    -- цели смотреть почти ровно. Тогда честно берем центр цели
+    local center = target:WorldSpaceCenter()
+    local centerDir = center - eyePos
+    if centerDir:LengthSqr() >= 1
+        and centerDir.x == centerDir.x and centerDir.y == centerDir.y
+        and centerDir.z == centerDir.z then
+        local centerPitch = centerDir:Angle().p
+        if math.abs(aimAngle.p) > 60 and math.abs(centerPitch) < 30 then
+            if CurTime() >= (bot.aimBogusWarn or 0) then
+                bot.aimBogusWarn = CurTime() + 5
+                print(string.format(
+                    "[GeminiBots][aimFix] %s head=%s rawP=%.0f centerP=%.0f eye=%s wsc=%s tgtEye=%s",
+                    bot.ply:Nick(), tostring(bot.aimHead), aimAngle.p, centerPitch,
+                    tostring(eyePos), tostring(center), tostring(target:EyePos())))
+            end
+            aimAngle = centerDir:Angle()
+        end
+    end
+
     return aimAngle
 end
 
