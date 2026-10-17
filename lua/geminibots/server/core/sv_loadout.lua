@@ -718,13 +718,29 @@ local ROLE_OF_TYPE = {
     tactical = "tactical",
     melee = "melee",
 }
--- Порядок предпочтения и лимит единиц на роль: граната/тактика/мили — по
--- одной, стволов можно пару. special/other (ловушки, тазер) не берем вообще
-local ROLE_ORDER = { "primary", "secondary", "frag", "tactical", "melee" }
-local ROLE_CAP = { primary = 2, secondary = 2, frag = 1, tactical = 1, melee = 1 }
+-- Порядок предпочтения и лимит единиц на роль: граната/тактика/тазер/мили —
+-- по одной, стволов можно пару. C4 в случайную выдачу НЕ идет: его выдает
+-- C4-директор одному подрывнику (иначе все боты таскали бы бомбу и директор
+-- не мог бы выбрать подрывника). special/other разбираем по классу: тазер
+-- боты умеют, прочие ловушки (breachcharge, healthshot, SLAM) — нет
+local ROLE_ORDER = { "primary", "secondary", "frag", "tactical", "taser", "melee" }
+local ROLE_CAP = {
+    primary = 2, secondary = 2, frag = 1, tactical = 1,
+    taser = 1, melee = 1, bomb = 1,
+}
 
 local function RoleOf(class)
-    return ROLE_OF_TYPE[GeminiBots.Loadout:GetWeaponType(class)] or "other"
+    local r = ROLE_OF_TYPE[GeminiBots.Loadout:GetWeaponType(class)]
+    if r then return r end
+    local lower = string.lower(class)
+    local WA = GeminiBots.WeaponAdapters
+    if (WA and WA:Kind(class) == "short") or string.find(lower, "taser", 1, true) then
+        return "taser"
+    end
+    if string.find(lower, "c4", 1, true) or string.find(lower, "bomb", 1, true) then
+        return "bomb"
+    end
+    return "other"
 end
 
 -- Умный подбор: ровно wantCount единиц, но без дублей гранат/тактики и
