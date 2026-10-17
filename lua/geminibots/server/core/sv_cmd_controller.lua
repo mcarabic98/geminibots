@@ -88,6 +88,29 @@ hook.Add("StartCommand", "GeminiBots_StartCommand_Controller", function(ply, cmd
     cmd:SetViewAngles(bot.currentViewAngles)
     ply:SetEyeAngles(bot.currentViewAngles)
 
+    -- Диагностика «смотрит в пол»: ловим крутой pitch сам, без ручного зонда.
+    -- Печатаем источник взгляда и геометрию цели — по строке сразу видно виновника
+    if math.abs(bot.currentViewAngles.p) > 45
+        and CurTime() >= (bot.nextLookWarn or 0) then
+        bot.nextLookWarn = CurTime() + 3
+        local ep = ply:EyePos()
+        local tgt = bot.target
+        local tdesc, tdist, tdz = "нет", -1, 0
+        if IsValid(tgt) then
+            local tp = tgt:GetPos()
+            tdesc = tgt:IsPlayer() and tgt:Nick() or tgt:GetClass()
+            tdist = math.floor(ep:Distance(tp))
+            tdz = math.floor(tp.z - ep.z)
+        end
+        print(string.format(
+            "[GeminiBots][look] %s state=%s src=%s des=%.0f/%.0f cur=%.0f/%.0f цель=%s dist=%d dz=%d",
+            ply:Nick(), tostring(bot.state), tostring(bot.viewSrc),
+            bot.desiredViewAngles and bot.desiredViewAngles.p or 0,
+            bot.desiredViewAngles and bot.desiredViewAngles.y or 0,
+            bot.currentViewAngles.p, bot.currentViewAngles.y,
+            tdesc, tdist, tdz))
+    end
+
     -- 2. Применение движений (ForwardMove / SideMove / UpMove)
     cmd:SetForwardMove(bot.forwardMove or 0)
     cmd:SetSideMove(bot.sideMove or 0)

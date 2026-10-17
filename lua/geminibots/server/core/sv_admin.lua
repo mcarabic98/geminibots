@@ -19,7 +19,27 @@ concommand.Add("geminibots_bot_aim", function(ply, _, args)
         if IsValid(ply) then ply:PrintMessage(HUD_PRINTCONSOLE, s) else print(s) end
     end
     if not args[1] or args[1] == "" then
-        say("Использование: geminibots_bot_aim <ник>")
+        -- Без ника — компактная сводка по всем ботам: сразу видно, у кого
+        -- крутой pitch и какой источник взгляда его поставил
+        local any = false
+        say("=== Взгляд всех ботов (src / pitch) ===")
+        for _, bp in ipairs(player.GetBots()) do
+            if IsValid(bp) then
+                any = true
+                local b = GeminiBots:GetBot(bp)
+                local d = b and b.desiredViewAngles
+                local tgt = "нет"
+                if b and IsValid(b.target) then
+                    tgt = b.target:IsPlayer() and b.target:Nick() or b.target:GetClass()
+                end
+                say(string.format("%s state=%s src=%s des=%.0f/%.0f cur=%.0f цель=%s",
+                    bp:Nick(), b and tostring(b.state) or "-",
+                    b and tostring(b.viewSrc or "-") or "-",
+                    d and d.p or 0, d and d.y or 0, bp:EyeAngles().p, tgt))
+            end
+        end
+        if not any then say("(ботов нет)") end
+        if IsValid(ply) then ply:ChatPrint("[GeminiBots] Сводка взгляда в консоли (F10).") end
         return
     end
     local target = GeminiBots.Admin:FindBot(args[1])
