@@ -112,6 +112,7 @@ hook.Add("EntityTakeDamage", "GeminiBots_Memory_OnTakeDamage", function(target, 
             end)
             if okD and dir then
                 bot.desiredViewAngles = Angle(0, dir.y, 0)
+                bot.viewSrc = "hurt"
             end
 
             -- Переключаем в боевое состояние

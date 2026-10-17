@@ -40,6 +40,7 @@ function State:Update(bot, dt)
         local curYaw = bot.ply:EyeAngles().y
         local newYaw = curYaw + math.Rand(-60, 60)
         bot.desiredViewAngles = Angle(math.Rand(-10, 10), math.NormalizeAngle(newYaw), 0)
+        bot.viewSrc = "idle"
         bot.stateData.nextLookTime = CurTime() + math.Rand(1.0, 2.0)
     end
 

@@ -37,8 +37,15 @@ function State:Update(bot, dt)
     -- Взгляд — на точку потери: иначе бот идет и смотрит в стену
     local hasLOS = GeminiBots.Vision:HasLineOfSight(bot, target)
     if not hasLOS and bot.lastKnownTargetPos then
+        -- Поисковый взгляд на точку потери — только по горизонтали.
+        -- Точка — это НОГИ цели (+45), и когда бот оказывается почти над ней
+        -- (спуск вниз, этаж/уступ выше), вектор становится почти вертикальным
+        -- и взгляд падал в пол под -89. Оружием целимся только по видимой цели
         local lookPos = bot.lastKnownTargetPos + Vector(0, 0, 45)
-        bot.desiredViewAngles = (lookPos - ply:EyePos()):Angle()
+        local lookAng = (lookPos - ply:EyePos()):Angle()
+        bot.desiredViewAngles = Angle(math.Clamp(lookAng.p, -20, 20),
+            math.NormalizeAngle(lookAng.y), 0)
+        bot.viewSrc = "chase"
         if GeminiBots.Combat:TryWallbang(bot, target) then
             return
         end

@@ -90,6 +90,7 @@ function State:Update(bot, dt)
             -- Беглый взгляд в сторону коридора/двери на 35-50 градусов
             local glanceYaw = toNext.y + (math.random(0, 1) == 1 and 40 or -40)
             bot.desiredViewAngles = Angle(0, math.NormalizeAngle(glanceYaw), 0)
+            bot.viewSrc = "glance"
             bot.keepLookUntil = CurTime() + 0.5
         end
     end

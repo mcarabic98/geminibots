@@ -161,6 +161,7 @@ function GeminiBots.Navigator:Update(bot)
     -- glance в wander/investigate никогда не виден, бот смотрит только вперед
     if not IsValid(bot.target) and CurTime() >= (bot.keepLookUntil or 0) then
         bot.desiredViewAngles = Angle(0, moveAngle.y, 0)
+        bot.viewSrc = "nav"
     end
 
     -- Разбиваем преграду: смотрим в нее и бьем/стреляем, пока не развалится
@@ -169,8 +170,9 @@ function GeminiBots.Navigator:Update(bot)
         if not IsValid(bot.target) then
             local bc = bot.breakEnt:WorldSpaceCenter()
             local aim = (bc - ply:EyePos()):Angle()
-            bot.desiredViewAngles = Angle(math.Clamp(aim.p, -89, 89),
+            bot.desiredViewAngles = Angle(math.Clamp(aim.p, -60, 60),
                 math.NormalizeAngle(aim.y), 0)
+            bot.viewSrc = "break"
         end
         bot.buttons = bit.bor(bot.buttons or 0, IN_ATTACK)
     else

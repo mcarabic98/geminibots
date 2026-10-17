@@ -84,6 +84,7 @@ function State:Update(bot, dt)
                 yaw = (bot.stateData.targetPos - bot.ply:GetPos()):Angle().y
             end
             bot.desiredViewAngles = Angle(0, math.NormalizeAngle(yaw), 0)
+            bot.viewSrc = "search"
             bot.keepLookUntil = CurTime() + 0.5
         end
         return
@@ -101,6 +102,7 @@ function State:Update(bot, dt)
         local curYaw = bot.ply:EyeAngles().y
         bot.desiredViewAngles = Angle(math.Rand(-8, 8),
             math.NormalizeAngle(curYaw + math.Rand(-120, 120)), 0)
+        bot.viewSrc = "search"
     end
     -- Присед держим 1-2 сек, а не мигаем каждый тик
     if CurTime() >= (bot.crouchUntil or 0) then

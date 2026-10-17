@@ -56,6 +56,8 @@ function GeminiBots.FSM:UpdateBot(bot, dt)
 
     -- Сброс кнопок в начале каждого тика логики (состояния сами выставят нужные флаги)
     bot.buttons = 0
+    -- Метка источника взгляда: кто последним поставил desired (диагностика зонда)
+    bot.viewSrc = nil
 
     -- 1. Обновление сенсорной памяти
     GeminiBots.Memory:Update(bot)
@@ -142,6 +144,7 @@ function GeminiBots.FSM:UpdateBot(bot, dt)
         if not busy then
             local cur = bot.desiredViewAngles or bot.ply:EyeAngles()
             bot.desiredViewAngles = Angle(0, math.NormalizeAngle(cur.y + 540 * dt), 0)
+            bot.viewSrc = "spin"
         end
     end
 end

@@ -28,7 +28,10 @@ function GeminiBots.Combat:TryWallbang(bot, target)
         local wbWep = bot.ply:GetActiveWeapon()
         local cw = (IsValid(wbWep) and wbWep.Clip1) and wbWep:Clip1() or 1
         if cw ~= 0 then
-            if bot.wallbangAim then bot.desiredViewAngles = bot.wallbangAim end
+            if bot.wallbangAim then
+                bot.desiredViewAngles = bot.wallbangAim
+                bot.viewSrc = "wallbang"
+            end
             bot.buttons = bit.bor(bot.buttons or 0, IN_ATTACK)
             return true
         end
@@ -76,14 +79,19 @@ function GeminiBots.Combat:TryWallbang(bot, target)
     end
     if not penetrable then return false end
 
-    -- Предикт: куда враг ушел за укрытие за время полета пули
+    -- Предикт: куда враг ушел за укрытие за время полета пули.
+    -- Прыжок/падение в момент потери из виду давало огромную Vel.z, точка
+    -- предикта уезжала под пол и бот жёг очередью в землю. Прострел по стеклу
+    -- идет на уровне цели: держим точку у ее высоты, а не где угодно
     local vel = bot.lastSeenVel or Vector(0, 0, 0)
     local predicted = aimPoint + vel * (dist / 6000 + 0.2)
+    predicted.z = math.Clamp(predicted.z, aimPoint.z - 30, aimPoint.z + 30)
     local aimAngles = (predicted - eyePos):Angle()
-    aimAngles.p = math.Clamp(aimAngles.p, -89, 89)
+    aimAngles.p = math.Clamp(aimAngles.p, -35, 35)
     aimAngles.y = math.NormalizeAngle(aimAngles.y)
 
     bot.desiredViewAngles = aimAngles
+    bot.viewSrc = "wallbang"
     bot.wallbangAim = aimAngles
     bot.buttons = bit.bor(bot.buttons or 0, IN_ATTACK)
     bot.wallbangUntil = CurTime() + WALLBANG_BURST
@@ -160,6 +168,7 @@ function GeminiBots.Combat:Update(bot, dt)
         aimAngles, lobLanding, lobPoints = bot.lobAngles, bot.lobLanding, bot.lobPoints
         aimThreshold = 12
         bot.desiredViewAngles = aimAngles
+        bot.viewSrc = "tactical"
     end
     -- Между пересчетами дуги держим прошлый прицел, а не nil
     if aimAngles then
@@ -169,6 +178,7 @@ function GeminiBots.Combat:Update(bot, dt)
     end
 
     bot.desiredViewAngles = aimAngles
+    bot.viewSrc = (boomKind == "frag") and "lob" or "aim"
 
     -- 3. Проверка перезарядки. Пока магазин пуст и идет перезарядка —
     -- только она: движок игнорит релоад во время атаки, бот вечно щелкает

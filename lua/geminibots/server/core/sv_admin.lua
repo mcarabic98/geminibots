@@ -33,9 +33,10 @@ concommand.Add("geminibots_bot_aim", function(ply, _, args)
     local des = bot.desiredViewAngles
     local eye = target:EyeAngles()
     local cur = bot.currentViewAngles
-    add(string.format("desired=%s eye=%s current=%s",
+    add(string.format("desired=%s eye=%s current=%s src=%s",
         des and tostring(des) or "nil",
-        tostring(eye), cur and tostring(cur) or "nil"))
+        tostring(eye), cur and tostring(cur) or "nil",
+        tostring(bot.viewSrc or "-")))
     local tgt = bot.target
     if IsValid(tgt) then
         local okA, aimPt = pcall(function() return tgt:WorldSpaceCenter() end)

@@ -42,6 +42,7 @@ function GeminiBots.SWCS_BlindUpdate(bot)
         local curYaw = bot.ply:EyeAngles().y
         bot.desiredViewAngles = Angle(math.Rand(-10, 5),
             math.NormalizeAngle(curYaw + math.Rand(-90, 90)), 0)
+        bot.viewSrc = "blind"
     end
     bot.buttons = 0
     if math.random() < 0.4 then
@@ -130,7 +131,11 @@ timer.Create("GeminiBots_SWCS_DecoyScan", 0.7, 0, function()
             bot.investigatePos = dpos + Vector(math.Rand(-60, 60), math.Rand(-60, 60), 0)
             bot.investigateTime = CurTime()
             bot.investigateKind = "decoy"
-            bot.desiredViewAngles = (dpos - bot.ply:EyePos()):Angle()
+            -- Только yaw: деку слышат, а не видят, а разворот к точке на
+            -- земле накоротке клал взгляд в пол (как в слухе шагов)
+            local yawTo = (dpos - bot.ply:EyePos()):Angle().y
+            bot.desiredViewAngles = Angle(0, yawTo, 0)
+            bot.viewSrc = "decoy"
             GeminiBots.FSM:SetState(bot, "wander")
         end
     end

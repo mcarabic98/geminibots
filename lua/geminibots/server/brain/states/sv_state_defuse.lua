@@ -78,6 +78,7 @@ function State:Update(bot, dt)
             -- Вверх — прыжком с приседом в воздухе
             local dir = bomb:GetPos() - ply:GetPos()
             bot.desiredViewAngles = Angle(0, dir:Angle().y, 0)
+            bot.viewSrc = "defuse"
             bot.forwardMove = ply:GetRunSpeed() or 250
             if dir.z > 18 then
                 bot.buttons = bit.bor(bot.buttons or 0, IN_JUMP)
@@ -100,6 +101,8 @@ function State:Update(bot, dt)
     bot.forwardMove = 0
     bot.sideMove = 0
     bot.desiredViewAngles = ((bomb:GetPos() + Vector(0, 0, 30)) - ply:EyePos()):Angle()
+    bot.desiredViewAngles.p = math.Clamp(bot.desiredViewAngles.p, -60, 60)
+    bot.viewSrc = "defuse"
     bot.buttons = bit.bor(bot.buttons or 0, IN_USE)
 
     if bot.stateData.useStart == 0 then

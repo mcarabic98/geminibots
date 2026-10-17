@@ -261,6 +261,7 @@ function GeminiBots.Vision:FindBestTarget(bot)
                     -- Только yaw: разворот к ногам накоротке кладет pitch (см. ниже)
                     local yawTo = (e:GetPos() - bot.ply:EyePos()):Angle().y
                     bot.desiredViewAngles = Angle(0, yawTo, 0)
+                    bot.viewSrc = "sound"
                     GeminiBots.FSM:SetState(bot, "wander")
                 end
             end
@@ -338,6 +339,7 @@ function GeminiBots.Vision:FindBestTarget(bot)
                 if bot.state == "idle" or bot.state == "wander" then
                     local yawTo = (ent:GetPos() - bot.ply:EyePos()):Angle().y
                     bot.desiredViewAngles = Angle(0, yawTo, 0)
+                    bot.viewSrc = "sound"
                     if bot.state ~= "wander" or not bot.pathTargetPos
                         or bot.pathTargetPos:Distance(ent:GetPos()) > 200 then
                         GeminiBots.FSM:SetState(bot, "wander")
@@ -393,6 +395,7 @@ hook.Add("EntityFireBullets", "GeminiBots_Acoustic_Gunfire", function(entity, da
                         bot.investigateKind = "gunfire"
                         local yawTo = (shooterPos - bot.ply:EyePos()):Angle().y
                         bot.desiredViewAngles = Angle(0, yawTo, 0)
+                        bot.viewSrc = "sound"
                         GeminiBots.FSM:SetState(bot, "wander")
                     end
                 end
