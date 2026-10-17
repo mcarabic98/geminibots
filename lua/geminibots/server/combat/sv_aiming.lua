@@ -38,7 +38,7 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         -- Разброс тоже может прийти битым (NaN/отрицательный): math.Rand(NaN,..)
         -- заражал прицел NaN-ом, а math.Clamp(NaN,-89,89) потом возвращает 89
         local sp = am.spread or 0
-        if sp ~= sp or sp < 0 then sp = 0 end
+        if sp ~= sp or sp < 0 then sp = 0 elseif sp > 10 then sp = 10 end
         bot.aimSpreadP = math.Rand(-sp, sp) * 0.5
         bot.aimSpreadY = math.Rand(-sp, sp) * 0.5
     end
@@ -86,25 +86,20 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         return bot.lastAimAngles or Angle(0, 0, 0)
     end
     local aimAngle = toTarget:Angle()
+    local baseP = aimAngle.p
 
-    -- 4. Добавление естественного разброса (Inaccuracy)
-    local spreadP, spreadY = bot.aimSpreadP or 0, bot.aimSpreadY or 0
-    if spreadP ~= 0 or spreadY ~= 0 then
-        aimAngle.p = math.Clamp(aimAngle.p + spreadP, -89, 89)
-        aimAngle.y = math.NormalizeAngle(aimAngle.y + spreadY)
-    end
-
-    -- NaN-страховка. math.Clamp(NaN, -89, 89) в GMod возвращает 89, а
-    -- NormalizeAngle(NaN) оставляет yaw — бот застывал «смотрит в пол 89
-    -- при верном yaw». Ловим заражение и целимся прямо в центр цели
-    if aimAngle.p ~= aimAngle.p or aimAngle.y ~= aimAngle.y then
+    -- 3.5 NaN-страховка ДО разброса: math.Clamp(NaN,-89,89) вернул бы 89 и
+    -- замаскировал заражение (проверка после клампа уже видит 89, а не NaN).
+    -- Битый вектор (скорость/EyePos цели) давал pitch 89 при верном yaw
+    if baseP ~= baseP or aimAngle.y ~= aimAngle.y
+        or toTarget.x ~= toTarget.x or toTarget.y ~= toTarget.y or toTarget.z ~= toTarget.z then
         if CurTime() >= (bot.aimNaNWarn or 0) then
             bot.aimNaNWarn = CurTime() + 5
-            local v = target:GetVelocity()
             print(string.format(
-                "[GeminiBots][aimNaN] %s spread=(%s,%s) vel=%s eye=%s wsc=%s",
-                bot.ply:Nick(), tostring(bot.aimSpreadP), tostring(bot.aimSpreadY),
-                tostring(v), tostring(eyePos), tostring(target:WorldSpaceCenter())))
+                "[GeminiBots][aimNaN] %s baseP=%s dir=%s aimPos=%s vel=%s eye=%s wsc=%s",
+                bot.ply:Nick(), tostring(baseP), tostring(toTarget), tostring(aimPos),
+                tostring(target:GetVelocity()), tostring(eyePos),
+                tostring(target:WorldSpaceCenter())))
         end
         local dir = target:WorldSpaceCenter() - eyePos
         if dir:LengthSqr() >= 1 and dir.x == dir.x and dir.y == dir.y and dir.z == dir.z then
@@ -112,6 +107,17 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         else
             aimAngle = bot.lastAimAngles or Angle(0, 0, 0)
         end
+        baseP = aimAngle.p
+    end
+
+    -- 4. Добавление естественного разброса (Inaccuracy).
+    -- Разброс санируем: битый/абсурдный (>20 град) сам клампится в 89
+    local spreadP, spreadY = bot.aimSpreadP or 0, bot.aimSpreadY or 0
+    if spreadP ~= spreadP or spreadP > 20 or spreadP < -20 then spreadP = 0 end
+    if spreadY ~= spreadY or spreadY > 20 or spreadY < -20 then spreadY = 0 end
+    if spreadP ~= 0 or spreadY ~= 0 then
+        aimAngle.p = math.Clamp(aimAngle.p + spreadP, -89, 89)
+        aimAngle.y = math.NormalizeAngle(aimAngle.y + spreadY)
     end
 
     -- Страховка от битой точки прицела: у чужих ботов EyePos иногда отдает
@@ -127,8 +133,9 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
             if CurTime() >= (bot.aimBogusWarn or 0) then
                 bot.aimBogusWarn = CurTime() + 5
                 print(string.format(
-                    "[GeminiBots][aimFix] %s head=%s rawP=%.0f centerP=%.0f eye=%s wsc=%s tgtEye=%s",
-                    bot.ply:Nick(), tostring(bot.aimHead), aimAngle.p, centerPitch,
+                    "[GeminiBots][aimFix] %s head=%s baseP=%.0f rawP=%.0f centerP=%.0f spP=%s spY=%s aimPos=%s eye=%s wsc=%s tgtEye=%s",
+                    bot.ply:Nick(), tostring(bot.aimHead), baseP, aimAngle.p, centerPitch,
+                    tostring(bot.aimSpreadP), tostring(bot.aimSpreadY), tostring(aimPos),
                     tostring(eyePos), tostring(center), tostring(target:EyePos())))
             end
             aimAngle = centerDir:Angle()
