@@ -144,7 +144,8 @@ function GeminiBots.BuildAboutTabInner(frame, form)
 
     T.MutedLabel(form, ru and "Версия: 1.0.0" or "Version: 1.0.0")
     T.MutedLabel(form, ru and "Автор: mcarabic98" or "Author: mcarabic98")
-    T.MutedLabel(form, ru and "Совместная разработка: OpenCode" or "Co-developed with: OpenCode")
+    T.MutedLabel(form, ru and "Совместная разработка (фуу вайбкод): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (страшные лимиты), Deepsek v4.1 flash (на смену Muse)"
+        or "Co-developed with (eww vibecode): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (scary limits), Deepseek v4.1 flash (replaced Muse)")
     T.MutedLabel(form, ru and "ИИ стандартных ботов: бой, чувства, чат, оружие, режимы."
         or "Stock bot AI: combat, senses, chat, weapons, gamemodes.")
 
@@ -154,9 +155,6 @@ function GeminiBots.BuildAboutTabInner(frame, form)
         gui.OpenURL("https://github.com/mcarabic98/geminibots")
     end
     T.Tooltip(btnGH, "https://github.com/mcarabic98/geminibots")
-
-    T.MutedLabel(form, ru and "Открытие/закрытие окна: bind p geminibots_menu"
-        or "Toggle window: bind p geminibots_menu")
 end
 
 -- Вкладка "Меню" (только здесь): настройки интерфейса. Храним в GeminiBots,
