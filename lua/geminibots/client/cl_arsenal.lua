@@ -228,36 +228,56 @@ function GeminiBots.OpenArsenal()
     row2:DockMargin(0, 6, 0, 0)
     row2.Paint = function() end
 
-    local search = vgui.Create("DTextEntry", row1)
+    -- Поиск: как везде — клик открывает диалог ввода (полям фокус не дают,
+    -- печатать прямо в поле нельзя). Раскрашено под поле ввода, но это
+    -- кнопка: нередактируемый DTextEntry клик не отдавал, диалог не открывался
+    local search = vgui.Create("DButton", row1)
     search:Dock(LEFT)
     search:SetWide(240)
-    search:SetFont("GeminiText")
-    T.StyleTextEntry(search)
+    search:SetText("")
+    search.hover = 0
+    search.GeminiValue = ""
+    search.GeminiPlaceholder = "Поиск..."
+    function search:Paint(w, h)
+        self.hover = Lerp(FrameTime() * 12, self.hover or 0, self:IsHovered() and 1 or 0)
+        draw.RoundedBox(math.min(T.Corner(), math.floor(h / 2)), 0, 0, w, h,
+            T.Mix(T.Colors.input, T.Colors.accentDk, (self.hover or 0) * 0.5))
+        local txt = self.GeminiValue
+        local col = T.Colors.text
+        if not txt or txt == "" then
+            txt = self.GeminiPlaceholder or ""
+            col = T.Colors.muted
+        end
+        local ok, l = pcall(utf8.len, txt)
+        if ok and l and l > 28 then
+            local _, pos = pcall(utf8.offset, txt, 29)
+            if pos then txt = string.sub(txt, 1, pos - 1) .. "…" end
+        end
+        draw.SimpleText(txt, "GeminiText", 10, h / 2, col, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+    end
     OnLang(function()
         if IsValid(search) then
-            search:SetPlaceholderText(LiveRU() and "Поиск по классу или названию..." or "Search class or name...")
+            search.GeminiPlaceholder = LiveRU() and "Поиск по классу или названию..."
+                or "Search class or name..."
         end
     end)
-    search.OnChange = function(self)
-        frame.SearchText = string.lower(self:GetValue() or "")
-        frame:RefreshList()
-    end
-    -- Поиск через диалог: поле только показывает, печатаем в диалоге
-    search:SetEditable(false)
-    search.OnMousePressed = function(self, code)
-        if code ~= MOUSE_LEFT then return end
+    search.DoClick = function()
         T.ClickSound()
-        local old = self:GetValue()
+        local old = search.GeminiValue or ""
         T.AskText(LiveRU() and "Поиск" or "Search", old, false,
             function(v)
+                search.GeminiValue = v or ""
                 frame.SearchText = string.lower(v or "")
                 frame:RefreshList()
-                if IsValid(search) then search:SetText(v or "") end
             end,
-            function() end,
+            function(v)
+                search.GeminiValue = v or ""
+                frame.SearchText = string.lower(v or "")
+                frame:RefreshList()
+            end,
             function()
-                if IsValid(search) then search:SetText(old) end
-                frame.SearchText = string.lower(old or "")
+                search.GeminiValue = old
+                frame.SearchText = string.lower(old)
                 frame:RefreshList()
             end)
     end
