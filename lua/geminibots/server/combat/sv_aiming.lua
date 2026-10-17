@@ -80,35 +80,18 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
     end
 
     -- 3. Вычисление базовых углов. Клинч (точки совпали) дает вырожденный
-    -- угол (движок вернет pitch 90): держим прошлый прицел вместо взлета
+    -- угол: держим прошлый прицел вместо взлета. Углы считаем явно через
+    -- atan2 — Vector:Angle() изредка отдавал мусор (pitch 360), который
+    -- math.Clamp достраивал до 89 (бот «смотрит в пол»)
     local toTarget = (aimPos - eyePos)
-    if toTarget:LengthSqr() < 1 then
+    if toTarget:LengthSqr() < 1
+        or toTarget.x ~= toTarget.x or toTarget.y ~= toTarget.y or toTarget.z ~= toTarget.z then
         return bot.lastAimAngles or Angle(0, 0, 0)
     end
-    local aimAngle = toTarget:Angle()
-    local baseP = aimAngle.p
-
-    -- 3.5 NaN-страховка ДО разброса: math.Clamp(NaN,-89,89) вернул бы 89 и
-    -- замаскировал заражение (проверка после клампа уже видит 89, а не NaN).
-    -- Битый вектор (скорость/EyePos цели) давал pitch 89 при верном yaw
-    if baseP ~= baseP or aimAngle.y ~= aimAngle.y
-        or toTarget.x ~= toTarget.x or toTarget.y ~= toTarget.y or toTarget.z ~= toTarget.z then
-        if CurTime() >= (bot.aimNaNWarn or 0) then
-            bot.aimNaNWarn = CurTime() + 5
-            print(string.format(
-                "[GeminiBots][aimNaN] %s baseP=%s dir=%s aimPos=%s vel=%s eye=%s wsc=%s",
-                bot.ply:Nick(), tostring(baseP), tostring(toTarget), tostring(aimPos),
-                tostring(target:GetVelocity()), tostring(eyePos),
-                tostring(target:WorldSpaceCenter())))
-        end
-        local dir = target:WorldSpaceCenter() - eyePos
-        if dir:LengthSqr() >= 1 and dir.x == dir.x and dir.y == dir.y and dir.z == dir.z then
-            aimAngle = dir:Angle()
-        else
-            aimAngle = bot.lastAimAngles or Angle(0, 0, 0)
-        end
-        baseP = aimAngle.p
-    end
+    local horiz = math.sqrt(toTarget.x * toTarget.x + toTarget.y * toTarget.y)
+    local baseP = math.deg(math.atan2(-toTarget.z, math.max(horiz, 0.0001)))
+    local baseY = math.deg(math.atan2(toTarget.y, toTarget.x))
+    local aimAngle = Angle(baseP, baseY, 0)
 
     -- 4. Добавление естественного разброса (Inaccuracy).
     -- Разброс санируем: битый/абсурдный (>20 град) сам клампится в 89
@@ -120,25 +103,25 @@ function GeminiBots.Aiming:CalculateAimAngles(bot, target)
         aimAngle.y = math.NormalizeAngle(aimAngle.y + spreadY)
     end
 
-    -- Страховка от битой точки прицела: у чужих ботов EyePos иногда отдает
-    -- точку почти под ногами, и взгляд падает в пол (pitch 89), хотя в центр
-    -- цели смотреть почти ровно. Тогда честно берем центр цели
+    -- Страховка от битой точки прицела: прицел ушел круто, а в центр цели
+    -- смотреть почти ровно — значит точка прицела врет. Берем центр цели
     local center = target:WorldSpaceCenter()
     local centerDir = center - eyePos
     if centerDir:LengthSqr() >= 1
         and centerDir.x == centerDir.x and centerDir.y == centerDir.y
         and centerDir.z == centerDir.z then
-        local centerPitch = centerDir:Angle().p
+        local cHoriz = math.sqrt(centerDir.x * centerDir.x + centerDir.y * centerDir.y)
+        local centerPitch = math.deg(math.atan2(-centerDir.z, math.max(cHoriz, 0.0001)))
         if math.abs(aimAngle.p) > 60 and math.abs(centerPitch) < 30 then
             if CurTime() >= (bot.aimBogusWarn or 0) then
                 bot.aimBogusWarn = CurTime() + 5
                 print(string.format(
-                    "[GeminiBots][aimFix] %s head=%s baseP=%.0f rawP=%.0f centerP=%.0f spP=%s spY=%s aimPos=%s eye=%s wsc=%s tgtEye=%s",
-                    bot.ply:Nick(), tostring(bot.aimHead), baseP, aimAngle.p, centerPitch,
-                    tostring(bot.aimSpreadP), tostring(bot.aimSpreadY), tostring(aimPos),
-                    tostring(eyePos), tostring(center), tostring(target:EyePos())))
+                    "[GeminiBots][aimFix] %s head=%s baseP=%.0f baseY=%.0f rawP=%.0f centerP=%.0f spP=%s spY=%s dir=%s eye=%s wsc=%s",
+                    bot.ply:Nick(), tostring(bot.aimHead), baseP, baseY, aimAngle.p, centerPitch,
+                    tostring(bot.aimSpreadP), tostring(bot.aimSpreadY), tostring(toTarget),
+                    tostring(eyePos), tostring(center)))
             end
-            aimAngle = centerDir:Angle()
+            aimAngle = Angle(centerPitch, math.deg(math.atan2(centerDir.y, centerDir.x)), 0)
         end
     end
 

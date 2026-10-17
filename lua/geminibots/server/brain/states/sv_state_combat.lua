@@ -45,9 +45,11 @@ function State:Update(bot, dt)
         -- (спуск вниз, этаж/уступ выше), вектор становится почти вертикальным
         -- и взгляд падал в пол под -89. Оружием целимся только по видимой цели
         local lookPos = bot.lastKnownTargetPos + Vector(0, 0, 45)
-        local lookAng = (lookPos - ply:EyePos()):Angle()
-        bot.desiredViewAngles = Angle(math.Clamp(lookAng.p, -20, 20),
-            math.NormalizeAngle(lookAng.y), 0)
+        local ld = lookPos - ply:EyePos()
+        local lh = math.sqrt(ld.x * ld.x + ld.y * ld.y)
+        local lp = math.deg(math.atan2(-ld.z, math.max(lh, 0.0001)))
+        local ly = math.deg(math.atan2(ld.y, ld.x))
+        bot.desiredViewAngles = Angle(math.Clamp(lp, -20, 20), math.NormalizeAngle(ly), 0)
         bot.viewSrc = "chase"
         if GeminiBots.Combat:TryWallbang(bot, target) then
             return
