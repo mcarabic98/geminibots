@@ -120,7 +120,9 @@ function GeminiBots.OpenArsenal()
     if IsValid(GeminiBots.ArsenalFrame) then
         GeminiBots.ArsenalFrame:SetMouseInputEnabled(true)
         GeminiBots.ArsenalFrame:SetKeyboardInputEnabled(false)
-        GeminiBots.ArsenalFrame:Center()
+        -- Позиция из сохранения (как при первом открытии), а не центр:
+        -- Center затирал позицию, которую игрок выбрал сам
+        GeminiBots.Theme.LoadWinPos("arsenal", GeminiBots.ArsenalFrame)
         gui.EnableScreenClicker(true)
         RequestArsenal(GeminiBots.ArsenalFrame.ShowMissing)
         return GeminiBots.ArsenalFrame
@@ -237,7 +239,10 @@ function GeminiBots.OpenArsenal()
     search:SetText("")
     search.hover = 0
     search.GeminiValue = ""
-    search.GeminiPlaceholder = "Поиск..."
+    -- Плейсхолдер сразу по языку: до первого переключения языка он был
+    -- жестко русским и в английском интерфейсе
+    search.GeminiPlaceholder = LiveRU() and "Поиск по классу или названию..."
+        or "Search class or name..."
     function search:Paint(w, h)
         self.hover = Lerp(FrameTime() * 12, self.hover or 0, self:IsHovered() and 1 or 0)
         draw.RoundedBox(math.min(T.Corner(), math.floor(h / 2)), 0, 0, w, h,

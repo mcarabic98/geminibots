@@ -215,16 +215,6 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         btnDark:SetWide(half)
         btnLight:SetWide(half)
     end
-    btnDark.DoClick = function()
-        T.ClickSound()
-        T.WriteConVar("geminibots_menu_theme", "dark")
-        BuildTab(frame, "menu")
-    end
-    btnLight.DoClick = function()
-        T.ClickSound()
-        T.WriteConVar("geminibots_menu_theme", "light")
-        BuildTab(frame, "menu")
-    end
 
     header(ru and "Акцентный цвет" or "Accent color")
 
@@ -471,9 +461,15 @@ end
 
 function GeminiBots.OpenSettings()
     if IsValid(GeminiBots.SettingsFrame) then
-        GeminiBots.SettingsFrame:MakePopup()
-        GeminiBots.SettingsFrame:Center()
-        return GeminiBots.SettingsFrame
+        -- Как при первом открытии: мышь окну, клавиатура игре, позиция —
+        -- сохраненная. MakePopup здесь запрещен: он захватывает клавиатуру,
+        -- и WASD перестают идти в игру
+        local fr = GeminiBots.SettingsFrame
+        fr:SetMouseInputEnabled(true)
+        fr:SetKeyboardInputEnabled(false)
+        gui.EnableScreenClicker(true)
+        fr:MoveToFront()
+        return fr
     end
 
     local T = GeminiBots.Theme

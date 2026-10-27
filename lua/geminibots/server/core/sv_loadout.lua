@@ -301,7 +301,6 @@ local EXCLUDED_WEAPON_CLASSES = {
     ["weapon_fists"] = true,
     ["weapon_bugbait"] = true,
     ["manhack_welder"] = true,
-    ["manhacl_welder"] = true,
     -- Технические базы M9K: не спавнятся и без HoldType
     ["bobs_gun_base"] = true,
     ["bobs_shotty_base"] = true,
@@ -626,7 +625,7 @@ function GeminiBots.Loadout:ApplyPreset(presetName)
         local poolChanged = false
         for _, e in ipairs(self:ScanInstalledWeapons()) do
             local cls = e.class
-            if presetName == "all" or string.StartWith(cls, "m9k_") then
+            if presetName == "all" or string.StartWith(string.lower(cls), "m9k_") then
                 if not table.HasValue(self.Pool, cls) then
                     table.insert(self.Pool, cls)
                     poolChanged = true
@@ -637,8 +636,11 @@ function GeminiBots.Loadout:ApplyPreset(presetName)
     end
 
     for _, class in ipairs(self.Pool) do
+        -- Пул идет из weapons.txt как есть: матчим пресеты в нижнем регистре,
+        -- иначе "M9K_AK47" из файла не попал бы ни в один пресет
+        local lc = string.lower(class)
         local isEngineHL2 = DEFAULT_ENGINE_WEAPONS[class] ~= nil
-        local isM9K = string.StartWith(class, "m9k_")
+        local isM9K = string.StartWith(lc, "m9k_")
 
         if presetName == "all" then
             self.Active[class] = true
@@ -649,27 +651,27 @@ function GeminiBots.Loadout:ApplyPreset(presetName)
         elseif presetName == "m9k" then
             self.Active[class] = isM9K
         elseif presetName == "pistols" then
-            local isPistol = string.find(class, "pistol") or string.find(class, "357") or
-                             string.find(class, "deagle") or string.find(class, "glock") or
-                             string.find(class, "colt") or string.find(class, "usp") or
-                             string.find(class, "revolver") or string.find(class, "ragingbull")
+            local isPistol = string.find(lc, "pistol") or string.find(lc, "357") or
+                             string.find(lc, "deagle") or string.find(lc, "glock") or
+                             string.find(lc, "colt") or string.find(lc, "usp") or
+                             string.find(lc, "revolver") or string.find(lc, "ragingbull")
             self.Active[class] = (isPistol ~= nil)
         elseif presetName == "rifles" then
-            local isRifle = string.find(class, "smg") or string.find(class, "ar2") or
-                            string.find(class, "ak47") or string.find(class, "m4a1") or
-                            string.find(class, "mp5") or string.find(class, "ump") or
-                            string.find(class, "famas") or string.find(class, "scar") or
-                            string.find(class, "val") or string.find(class, "vector")
+            local isRifle = string.find(lc, "smg") or string.find(lc, "ar2") or
+                            string.find(lc, "ak47") or string.find(lc, "m4a1") or
+                            string.find(lc, "mp5") or string.find(lc, "ump") or
+                            string.find(lc, "famas") or string.find(lc, "scar") or
+                            string.find(lc, "val") or string.find(lc, "vector")
             self.Active[class] = (isRifle ~= nil)
         elseif presetName == "shotguns" then
-            local isShotgun = string.find(class, "shotgun") or string.find(class, "spas") or
-                              string.find(class, "remington") or string.find(class, "mossberg") or
-                              string.find(class, "striker")
+            local isShotgun = string.find(lc, "shotgun") or string.find(lc, "spas") or
+                              string.find(lc, "remington") or string.find(lc, "mossberg") or
+                              string.find(lc, "striker")
             self.Active[class] = (isShotgun ~= nil)
         elseif presetName == "snipers" then
-            local isSniper = string.find(class, "crossbow") or string.find(class, "awp") or
-                             string.find(class, "barret") or string.find(class, "svu") or
-                             string.find(class, "dragunov") or string.find(class, "sniper")
+            local isSniper = string.find(lc, "crossbow") or string.find(lc, "awp") or
+                             string.find(lc, "barret") or string.find(lc, "svu") or
+                             string.find(lc, "dragunov") or string.find(lc, "sniper")
             self.Active[class] = (isSniper ~= nil)
         elseif presetName == "default" then
             self.Active[class] = true
@@ -1111,7 +1113,7 @@ concommand.Add("geminibots_weapon_list", function()
         local active = (GeminiBots.Loadout.Active[class] ~= false) and "[ВКЛ / ON]" or "[ВЫКЛ / OFF]"
         local name = GeminiBots.Loadout:GetWeaponPrintName(class)
         local pack = GeminiBots.Loadout:GetWeaponPack(class)
-        print(string.format(" - %-22s %-12s [%s] (%s)", class, active, pack, name))
+        print(string.format(" - %-22s %-16s %s (%s)", class, active, pack, name))
     end
 end, nil, "Вывести список всего оружия в пуле ботов")
 

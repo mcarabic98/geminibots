@@ -30,7 +30,8 @@ end
 
 local function MatchPrefix(lower, prefixes)
     for _, p in ipairs(prefixes or {}) do
-        if string.StartWith(lower, p) then return true end
+        -- Префиксы адаптера тоже в нижний: заглавные в определении молча не матчились
+        if string.StartWith(lower, string.lower(p)) then return true end
     end
     return false
 end

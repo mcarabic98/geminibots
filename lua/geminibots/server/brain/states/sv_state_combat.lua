@@ -21,7 +21,7 @@ function State:Update(bot, dt)
     -- Кулдаун fleeLockUntil рвет вечную петлю combat->flee->combat при
     -- низком HP (flee не лечит, без кулдауна бот мигает состояниями)
     local fleeThreshold = (cfg and cfg.FleeHealthThreshold) or 0.25
-    if (ply:Health() / ply:GetMaxHealth()) <= fleeThreshold
+    if (ply:Health() / math.max(1, ply:GetMaxHealth())) <= fleeThreshold
         and CurTime() >= (bot.fleeLockUntil or 0) then
         GeminiBots.FSM:SetState(bot, "flee")
         return

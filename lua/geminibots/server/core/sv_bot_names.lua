@@ -147,7 +147,7 @@ function GeminiBots:AssignBotName(ply, forcePool)
     local chosenNick = self:PickFreeNick(ply)
 
     ply:SetNWString("GeminiBots_CustomNick", chosenNick)
-    self:Log("Боту назначен уникальный ник: %s (стандартный: %s)", chosenNick, ply:EntIndex())
+    self:Log("Боту назначен уникальный ник: %s (EntIndex: %s)", chosenNick, ply:EntIndex())
     return chosenNick
 end
 

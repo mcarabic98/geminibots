@@ -398,18 +398,27 @@ timer.Simple(5, function()
         local addbot = ulx.command("GeminiBots", "ulx addbot", function(calling_ply, count)
             local n = math.Clamp(math.floor(count or 1), 1, game.MaxPlayers())
             local spawned = 0
+            local scheduled = 0
             for i = 1, n do
                 if #player.GetAll() >= game.MaxPlayers() then break end
+                scheduled = scheduled + 1
                 timer.Simple(0.05 * (i - 1), function()
                     if GeminiBots.SpawnBotWithNick then
-                        GeminiBots.SpawnBotWithNick(GeminiBots.NextCustomNick
-                            and GeminiBots.NextCustomNick() or nil)
+                        if GeminiBots.SpawnBotWithNick(GeminiBots.NextCustomNick
+                            and GeminiBots.NextCustomNick() or nil) then
+                            spawned = spawned + 1
+                        end
                     end
                 end)
-                spawned = spawned + 1
             end
-            if ulx.fancyLogAdmin then
-                ulx.fancyLogAdmin(calling_ply, "#A добавил ботов GeminiBots (#s шт.)", spawned)
+            -- Лог после отработки таймеров: раньше рапортовали запрошенное
+            -- число, даже если спавн не удался (сервер стал полон)
+            if scheduled > 0 then
+                timer.Simple(0.05 * scheduled + 0.5, function()
+                    if ulx.fancyLogAdmin then
+                        ulx.fancyLogAdmin(calling_ply, "#A добавил ботов GeminiBots (#s шт.)", spawned)
+                    end
+                end)
             end
         end, "!addbot")
         addbot:addParam({ type = ULib.cmds.NumArg, min = 1, max = 128, hint = "сколько", ULib.cmds.optional })

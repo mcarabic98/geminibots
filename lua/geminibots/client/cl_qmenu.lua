@@ -519,7 +519,8 @@ local function BuildSettingsMenu(panel, tab, opts)
         for _, entry in ipairs(GeminiBots.CachedSkillPresets) do
             if entry.custom then
                 local presetId = entry.id
-                defs[#defs + 1] = { label = presetId .. " (свой)", fn = function()
+                local customTag = (GeminiBots.GetMenuLang() == "ru") and "свой" or "custom"
+                defs[#defs + 1] = { label = presetId .. " (" .. customTag .. ")", fn = function()
                     net.Start("GeminiBots_ApplySkillPreset")
                     net.WriteString(presetId)
                     net.SendToServer()

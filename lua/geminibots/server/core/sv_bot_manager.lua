@@ -243,14 +243,15 @@ end)
 
 -- Спавн одного бота: с кастомным ником сразу в движке, чтобы имя
 -- видели все (табы, киллфид, читы) — а не только наш код по NWString.
--- Не вышло с именем — обычный bot
+-- Не вышло с именем — обычный bot. Возвращает true, если бот заспавнился.
 local function SpawnOneBot(nick)
-    if #player.GetAll() >= game.MaxPlayers() then return end
+    if #player.GetAll() >= game.MaxPlayers() then return false end
     if nick and nick ~= "" then
         local ok, bot = pcall(player.CreateNextBot, nick)
-        if ok and IsValid(bot) then return end
+        if ok and IsValid(bot) then return true end
     end
     RunConsoleCommand("bot")
+    return true
 end
 
 local function NextCustomNick()

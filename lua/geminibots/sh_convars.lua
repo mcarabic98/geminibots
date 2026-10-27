@@ -100,8 +100,8 @@ function GeminiBots:SyncConfigFromConVars()
     local cfg = self.Config
 
     cfg.Enabled = GetConVar("geminibots_enabled"):GetBool()
-    cfg.CustomNames = GetConVar("geminibots_custom_names") and GetConVar("geminibots_custom_names"):GetBool() or true
-    cfg.PreserveBots = GetConVar("geminibots_preserve_bots") and GetConVar("geminibots_preserve_bots"):GetBool() or true
+    cfg.CustomNames = GetConVar("geminibots_custom_names"):GetBool()
+    cfg.PreserveBots = GetConVar("geminibots_preserve_bots"):GetBool()
     cfg.Debug = GetConVar("geminibots_debug"):GetBool()
     cfg.DebugDraw = GetConVar("geminibots_debug_draw"):GetBool()
 
@@ -135,7 +135,7 @@ function GeminiBots:SyncConfigFromConVars()
     cfg.VisionFOV = GetConVar("geminibots_vision_fov"):GetFloat()
     cfg.VisionRange = GetConVar("geminibots_vision_range"):GetFloat()
     cfg.HearingRange = GetConVar("geminibots_hearing_range"):GetFloat()
-    cfg.GunHearingRange = GetConVar("geminibots_gun_hearing_range") and GetConVar("geminibots_gun_hearing_range"):GetFloat() or 3000
+    cfg.GunHearingRange = GetConVar("geminibots_gun_hearing_range"):GetFloat()
     cfg.MemoryDuration = GetConVar("geminibots_memory_duration"):GetFloat()
 
     if cfg.Targeting then
@@ -262,7 +262,8 @@ end, nil, "Вкл/выкл отрисовку отладки (траектори
 
 -- Команда для сброса всех настроек к дефолтным значениям
 concommand.Add("geminibots_reset_defaults", function(ply)
-    if IsValid(ply) and not ply:IsSuperAdmin() then return end
+    -- Как у остальных команд аддона: админ, суперадмин или синглплеер
+    if IsValid(ply) and not ply:IsSuperAdmin() and not ply:IsAdmin() and not game.SinglePlayer() then return end
     for _, def in ipairs(CONVAR_DEFS) do
         RunConsoleCommand(def[1], def[2])
     end

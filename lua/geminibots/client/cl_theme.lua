@@ -529,7 +529,6 @@ GeminiBots.ConVarDescsEN = {
     ["geminibots_appearance_skin"] = "Random model skins (on/off)",
     ["geminibots_appearance_bodygroups"] = "Random bodygroups (on/off)",
     ["geminibots_appearance_color"] = "Random player color (on/off)",
-    ["geminibots_appearance_respawn"] = "Change appearance on every respawn (On = Yes, Off = Once)",
     ["geminibots_appearance_respawn"] = "Change appearance on every respawn (on/off)",
     ["geminibots_loadout_enabled"] = "Random weapons on spawn (on/off)",
     ["geminibots_loadout_min"] = "Min weapons given (1-5)",

@@ -38,12 +38,13 @@ function GeminiBots.FSM:SetState(bot, newStateName, ...)
     bot.state = newStateName
     bot.stateData = {} -- Очистка временных данных предыдущего состояния
 
+    local plyNick = IsValid(bot.ply) and bot.ply:Nick() or "?"
     local newStateObj = self.States[newStateName]
     if newStateObj and newStateObj.Enter then
         newStateObj:Enter(bot, ...)
-        GeminiBots:Debug("Бот %s перешел: %s -> %s", bot.ply:Nick(), oldState or "none", newStateName)
+        GeminiBots:Debug("Бот %s перешел: %s -> %s", plyNick, oldState or "none", newStateName)
     else
-        GeminiBots:Warn("Состояние %s не найдено для бота %s!", newStateName, bot.ply:Nick())
+        GeminiBots:Warn("Состояние %s не найдено для бота %s!", newStateName, plyNick)
     end
 end
 

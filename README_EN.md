@@ -10,15 +10,15 @@ This addon replaces the static behavior of stock bots (`bot`) with a full AI: bo
 - **Chat**: kill/death lines, smart context (K/D, streaks, ping), greetings and duels with players.
 - **Weapons**: Arsenal window scanning installed packs (HL2, M9K, TFA, ArcCW, CW2.0, SWCS, FA:S), ground-weapon pickup.
 - **Gamemodes**: SWCS (tactics, flashes, molotovs, C4), Murder, HL2 deathmatch, NPCs and PvE.
-- **Menu**: standalone window with dark/light theme, RU/EN (auto from game language), ESP with boxes and skeletons.
+- **Menu**: standalone window with dark/light theme, RU/EN (auto from game language).
 - **Custom FSM states**: drop-in files in `data/`, no addon edits needed.
 
 Details (in Russian for now): `docs/` — see [README.md](README.md) for the index.
 
 ## Requirements
 
-- Garry's Mod, a map **with a navmesh** (bots stand still without one).
-- Optional: ULX (`!bringbots` commands), SWCS, VJ Base / DrGBase, weapon packs.
+- Garry's Mod, a map **with a navmesh**.
+- Optional: ULX, SWCS, VJ Base / DrGBase, weapon packs.
 
 ## Install
 

@@ -8,11 +8,16 @@ GeminiBots.Chat = GeminiBots.Chat or {}
 
 -- Свой lower с кириллицей: ванильный в GMod только под ASCII,
 -- капс "ПРИВЕТ" им не ловился. Ниже покрываем А-Я + Ё.
+-- Внимание: А-П и Р-Я кодируются по-разному (а-п: D0 B0-BF, р-я: D1 80-8F),
+-- поэтому второй диапазон меняет и первый байт, иначе на выходе битый UTF-8.
 function GeminiBots.Utf8Lower(s)
     s = string.lower(s or "")
     s = string.gsub(s, "\208\129", "\209\145") -- Ё -> ё
-    s = string.gsub(s, "\208([\144-\175])", function(c)
-        return "\208" .. string.char(c:byte() + 32) -- А-Я -> а-я
+    s = string.gsub(s, "\208([\144-\159])", function(c)
+        return "\208" .. string.char(c:byte() + 32) -- А-П -> а-п
+    end)
+    s = string.gsub(s, "\208([\160-\175])", function(c)
+        return "\209" .. string.char(c:byte() - 32) -- Р-Я -> р-я
     end)
     return s
 end
