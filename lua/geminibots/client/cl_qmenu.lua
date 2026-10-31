@@ -20,7 +20,7 @@ local PHRASES = {
         MenuTitle = "GeminiBots - Управление ботами",
         MenuDesc = "Настройка искусственного интеллекта стандартных ботов в реальном времени.",
 
-        LangButton = "Язык: РУССКИЙ (клик: авто -> RU -> EN)",
+        LangButton = "Язык: РУССКИЙ (клик: авто -> RU -> UK -> ES -> PT -> EN)",
 
         -- Секция 1
         HeaderGeneral = "Основные параметры",
@@ -160,7 +160,7 @@ local PHRASES = {
         MenuTitle = "GeminiBots - Bot Management",
         MenuDesc = "Real-time AI configuration for default Garry's Mod player bots.",
 
-        LangButton = "Language: ENGLISH (click: auto -> RU -> EN)",
+        LangButton = "Language: ENGLISH (click: auto -> RU -> UK -> ES -> PT -> EN)",
 
         -- Section 1
         HeaderGeneral = "General Settings",
@@ -295,15 +295,446 @@ local PHRASES = {
         ESPHP = "ESP: HP bar",
         ESPInfo = "ESP: info lines",
         ESPStatus = "ESP: statuses and path",
+    },
+    uk = {
+        MenuTitle = "GeminiBots - Керування ботами",
+        MenuDesc = "Налаштування ІІ стандартних ботів у реальному часі.",
+
+        LangButton = "Мова: УКРАЇНСЬКА (клік: авто -> RU -> UK -> ES -> PT -> EN)",
+
+        -- Секція 1
+        HeaderGeneral = "Основні параметри",
+        Enabled = "Увімкнути ІІ ботів",
+        CustomNames = "Унікальні кастомні ніки ботів",
+        PreserveBots = "Відновлювати ботів при зміні карти",
+        HeaderAppearance = "Зовнішність",
+        Appearance = "Випадкова зовнішність ботів (моделі/скіни)",
+        AppearanceModel = "Випадкові моделі гравців",
+        AppearanceSkin = "Випадкові скіни моделей",
+        AppearanceBodygroups = "Випадкові бодігрупи",
+        AppearanceColor = "Випадковий колір гравця",
+        AppearanceRespawn = "Змінювати зовнішність при кожному відродженні",
+        Debug = "Режим налагодження (вивід у консоль)",
+        DebugDraw = "Візуалізація налагодження у світі (траєкторії, шляхи)",
+
+        -- Секція 2
+        HeaderLoadout = "Вибір зброї ботів (Loadout & SWEPs)",
+        LoadoutEnabled = "Видавати випадкову зброю при спавні",
+        LoadoutStrip = "Очищати дефолтні тули (Sandbox)",
+        LoadoutMin = "Мін. кількість стволів",
+        LoadoutMax = "Макс. кількість стволів",
+        LoadoutAmmo = "Кількість запасних набоїв",
+        PresetHeader = "--- Швидкі пресети пулу зброї ---",
+        PresetAll = "Увімкнути ВСЮ зброю",
+        PresetHL2 = "Лише стандартні HL2",
+        PresetM9K = "Весь M9K (сканувати сервер)",
+        PresetPistols = "Лише пістолети",
+        PresetRifles = "Лише автомати та ПП",
+        PresetShotguns = "Лише дробовики",
+        PresetSnipers = "Лише снайперки",
+        PresetNone = "Вимкнути все",
+        WeaponListHeader = "--- Список зброї в пулі (Позначте потрібні) ---",
+        WeaponNotInstalled = " [НЕ ВСТАНОВЛЕНО НА СЕРВЕРІ]",
+        AddWeaponHelp = "Додати зброю за ім'ям класу (напр. m9k_vector):",
+        BtnAddWeapon = "Додати зброю в пул (+)",
+        BtnAddHeldWeapon = "Взяти ствол з рук і додати в пул ботів",
+        BtnGiveHeldWeapon = "Миттєво видати ствол з рук усім ботам",
+        BtnReloadWeapons = "Перезавантажити weapons.txt з диска",
+        BtnOpenArsenal = "ВІДКРИТИ АРСЕНАЛ: скан + пошук + фільтри",
+        WPackHeader = "--- Збройові паки (адаптери тактики) ---",
+        WPackFound = "знайдено",
+        WPackMissing = "немає на сервері",
+        C4Enabled = "Боти ставлять і розміновують C4 (потрібен SWCS)",
+
+        -- Секція 3
+        HeaderChat = "Чат і реакції ботів",
+        ChatEnabled = "Дозволити ботам спілкуватися в чаті",
+        SmartContext = "Розумний контекст фраз (облік K/D, стріків і читів)",
+        ChatKillChance = "Шанс насмішки після фрага",
+        ChatDeathChance = "Шанс виправдання після смерті",
+        ChatComebackChance = "Шанс відповіді на звинувачення бота",
+        ChatTauntChance = "Шанс бойової насмішки (аім/нички)",
+        FileLog = "Писати докладний лог у файл (data/geminibots/logs/debug.log)",
+        PacksHeader = "--- Текстові паки фраз (.txt) ---",
+        PacksHelp = "Файли: garrysmod/data/geminibots/chat/\n(Позначте галочками потрібні паки фраз):",
+        PackStats = "%s  [Фрагів: %d | Смертей: %d]",
+        BtnReloadPacks = "Перезавантажити .txt паки з диска",
+
+        -- Секція 4
+        HeaderPerception = "Сенсорика, зір і пам'ять",
+        VisionFOV = "Кут огляду (FOV у градусах)",
+        VisionRange = "Дальність видимості (юніти)",
+        HearingRange = "Слух кроків і бігу за стінами (юніти)",
+        GunHearingRange = "Слух пострілів по коридорах/карті (юніти)",
+        MemoryDuration = "Пам'ять про ціль за стіною (сек)",
+        TargetModeHeader = "--- Режим цілей (кого атакувати) ---",
+        TargetBoth = "Усі підряд",
+        TargetPvE = "PvE: спочатку NPC",
+        TargetPlayers = "Лише гравці",
+        TargetNPCs = "Лише NPC",
+
+        -- Секція 5
+        HeaderCombat = "Прицілювання і бойовий ІІ",
+        ReactionMin = "Мін. затримка реакції (сек)",
+        ReactionMax = "Макс. затримка реакції (сек)",
+        AimSpeed = "Швидкість повороту прицілу",
+        AimSmoothing = "Плавність доводки (Lerp)",
+        AimPrediction = "Випередження руху цілі (Lead Aim)",
+        AimSpread = "Розкид/помилка прицілювання (град)",
+        HeadshotChance = "Шанс целитися в голову",
+        CombatMinDist = "Мін. дистанція бою (відхід)",
+        CombatMaxDist = "Макс. дистанція бою (зближення)",
+        FleeHealth = "Поріг втечі (% здоров'я)",
+        Wallbang = "Простріл скла/крихкого (wallbang)",
+
+        HeaderSWCS = "SWCS: декої, флашки, вогонь",
+        SWCSHelp = "Декой — перевірка звуку з шансом (інакше ігнор). Флашка SWCS сліпить і глушить завжди. Вогонь молотова — відхід убік.",
+        DecoyChance = "Шанс піти на звук декоя",
+        FireAvoid = "Відходити від вогню молотова",
+        FireRadius = "Радіус реакції на вогонь (юніти)",
+
+        -- Секція 6
+        HeaderMovement = "Пересування і банніхоп",
+        BunnyHop = "Банніхоп на ходу (і без ворогів)",
+        BunnyHopChance = "Шанс стрибка при приземленні",
+
+        -- Секція 7
+        HeaderDifficulty = "Пресети складності",
+        DifficultyHelp = "Готові налаштування. Підкрути нижче і збережи свій пресет через поле.",
+        BtnSavePreset = "Зберегти поточні як пресет",
+        BtnDeletePreset = "Видалити пресет",
+        PresetNameHelp = "Ім'я свого пресету:",
+
+        -- Секція 8
+        HeaderActions = "Швидкі дії",
+        HeaderDebug = "Налагодження",
+        HeaderStates = "Стани FSM",
+        StatesHelp = "Викл — бот замість стану іде в idle. Idle вимкнути не можна.",
+        BtnSpawnBot = "Заспавнити бота (+1)",
+        BtnSpawnMax = "Заповнити сервер ботами (Максимум)",
+        BtnKickAll = "Видалити всіх ботів з сервера",
+        BtnRerollNames = "Рандомізувати ніки ботів",
+        BtnReloadNames = "Перезавантажити names.txt з диска",
+        BtnRerollAppearance = "Змінити зовнішність ботів",
+        BtnReloadAI = "Перезавантажити всіх ботів",
+        BtnNavGen = "Згенерувати Navmesh (nav_generate)",
+        BtnReset = "Скинути всі налаштування за замовчуванням",
+        BtnSaveBots = "Зберегти ботів (перенос карти)",
+        BtnRestoreBots = "Відновити збережених ботів",
+        TeleportHelp = "--- Телепорти (є ULX-міст: !bringbots, !gotobot) ---",
+        BtnBringBots = "Привести ВСІХ ботів до себе",
+        BotNickHelp = "Нік бота (можна частину):",
+        BtnBringOne = "Привести цього бота",
+        BtnGotoBot = "Телепортуватися до бота",
+        BtnBotInfo = "Інфо всіх ботів (у консоль)",
+        BtnBotInfoOne = "Інфо цього бота (у консоль)",
+        ESPHelp = "--- ESP (бокси + інфо, лише адмінам) ---",
+        ESPEnabled = "ESP ботів",
+        ESPSkeleton = "Скелети в ESP",
+        ESPBoxes = "ESP: бокси",
+        ESPHP = "ESP: смуга HP",
+        ESPInfo = "ESP: рядки інфо",
+        ESPStatus = "ESP: статуси і шлях",
+    },
+    es = {
+        MenuTitle = "GeminiBots - Gestión de bots",
+        MenuDesc = "Configuración en tiempo real de la IA de los bots estándar.",
+
+        LangButton = "Idioma: ESPAÑOL (clic: auto -> RU -> UK -> ES -> PT -> EN)",
+
+        -- Sección 1
+        HeaderGeneral = "Ajustes generales",
+        Enabled = "Activar la IA de los bots",
+        CustomNames = "Apodos personalizados únicos para bots",
+        PreserveBots = "Restaurar bots al cambiar de mapa",
+        HeaderAppearance = "Apariencia",
+        Appearance = "Apariencia aleatoria de bots (modelos/skins)",
+        AppearanceModel = "Modelos de jugador aleatorios",
+        AppearanceSkin = "Skins de modelo aleatorios",
+        AppearanceBodygroups = "Bodygroups aleatorios",
+        AppearanceColor = "Color de jugador aleatorio",
+        AppearanceRespawn = "Cambiar apariencia en cada reaparición",
+        Debug = "Modo depuración (salida por consola)",
+        DebugDraw = "Dibujo de depuración en el mundo (trayectorias, rutas)",
+
+        -- Sección 2
+        HeaderLoadout = "Selección de armas de bots (Loadout & SWEPs)",
+        LoadoutEnabled = "Dar armas aleatorias al aparecer",
+        LoadoutStrip = "Quitar herramientas predeterminadas (Sandbox)",
+        LoadoutMin = "Nº mínimo de armas",
+        LoadoutMax = "Nº máximo de armas",
+        LoadoutAmmo = "Cantidad de munición de reserva",
+        PresetHeader = "--- Presets rápidos del arsenal ---",
+        PresetAll = "Activar TODAS las armas",
+        PresetHL2 = "Solo HL2 estándar",
+        PresetM9K = "Todo M9K (escanear servidor)",
+        PresetPistols = "Solo pistolas",
+        PresetRifles = "Solo fusiles y subfusiles",
+        PresetShotguns = "Solo escopetas",
+        PresetSnipers = "Solo francotiradoras",
+        PresetNone = "Desactivar todo",
+        WeaponListHeader = "--- Lista de armas del pool (Marca las que quieras) ---",
+        WeaponNotInstalled = " [NO INSTALADA EN EL SERVIDOR]",
+        AddWeaponHelp = "Añadir arma por nombre de clase (p. ej. m9k_vector):",
+        BtnAddWeapon = "Añadir arma al pool (+)",
+        BtnAddHeldWeapon = "Tomar el arma en mano y añadirla al pool de bots",
+        BtnGiveHeldWeapon = "Entregar al instante el arma en mano a todos los bots",
+        BtnReloadWeapons = "Recargar weapons.txt desde el disco",
+        BtnOpenArsenal = "ABRIR ARSENAL: escaneo + búsqueda + filtros",
+        WPackHeader = "--- Packs de armas (adaptadores de táctica) ---",
+        WPackFound = "detectado",
+        WPackMissing = "no está en el servidor",
+        C4Enabled = "Los bots colocan y desactivan C4 (requiere SWCS)",
+
+        -- Sección 3
+        HeaderChat = "Chat y reacciones de bots",
+        ChatEnabled = "Permitir que los bots escriban en el chat",
+        SmartContext = "Contexto inteligente de frases (K/D, rachas y trucos)",
+        ChatKillChance = "Probabilidad de burla tras una baja",
+        ChatDeathChance = "Probabilidad de excusa tras morir",
+        ChatComebackChance = "Probabilidad de responder a la acusación de un bot",
+        ChatTauntChance = "Probabilidad de provocación en combate (puntería/escondite)",
+        FileLog = "Escribir registro detallado en archivo (data/geminibots/logs/debug.log)",
+        PacksHeader = "--- Packs de texto de frases (.txt) ---",
+        PacksHelp = "Archivos: garrysmod/data/geminibots/chat/\n(Marca con casillas los packs que quieras):",
+        PackStats = "%s  [Bajas: %d | Muertes: %d]",
+        BtnReloadPacks = "Recargar packs .txt desde el disco",
+
+        -- Sección 4
+        HeaderPerception = "Sentidos, visión y memoria",
+        VisionFOV = "Campo de visión (FOV en grados)",
+        VisionRange = "Alcance máximo de visión (unidades)",
+        HearingRange = "Alcance auditivo de pasos tras muros (unidades)",
+        GunHearingRange = "Alcance auditivo de disparos por el mapa (unidades)",
+        MemoryDuration = "Memoria del objetivo tras un muro (seg)",
+        TargetModeHeader = "--- Modo de objetivos (a quién atacar) ---",
+        TargetBoth = "Todos por igual",
+        TargetPvE = "PvE: primero NPC",
+        TargetPlayers = "Solo jugadores",
+        TargetNPCs = "Solo NPC",
+
+        -- Sección 5
+        HeaderCombat = "Puntería e IA de combate",
+        ReactionMin = "Retardo mínimo de reacción (seg)",
+        ReactionMax = "Retardo máximo de reacción (seg)",
+        AimSpeed = "Velocidad de giro de la mira",
+        AimSmoothing = "Suavizado del apuntado (Lerp)",
+        AimPrediction = "Anticipación del movimiento del objetivo (Lead Aim)",
+        AimSpread = "Dispersión/error de puntería (grados)",
+        HeadshotChance = "Probabilidad de apuntar a la cabeza",
+        CombatMinDist = "Distancia mínima de combate (retroceso)",
+        CombatMaxDist = "Distancia máxima de combate (acercarse)",
+        FleeHealth = "Umbral de huida (% de vida)",
+        Wallbang = "Disparar a través de cristal/frágil (wallbang)",
+
+        HeaderSWCS = "SWCS: señuelos, flash, fuego",
+        SWCSHelp = "Señuelo: investigar el sonido con probabilidad (si no, ignorar). La flash de SWCS ciega y ensordece siempre. Fuego de molotov: apartarse a un lado.",
+        DecoyChance = "Probabilidad de investigar un señuelo",
+        FireAvoid = "Apartarse del fuego del molotov",
+        FireRadius = "Radio de reacción al fuego (unidades)",
+
+        -- Sección 6
+        HeaderMovement = "Movimiento y bunny-hop",
+        BunnyHop = "Bunny-hop al moverse (y sin enemigos)",
+        BunnyHopChance = "Probabilidad de salto al aterrizar",
+
+        -- Sección 7
+        HeaderDifficulty = "Presets de dificultad",
+        DifficultyHelp = "Ajustes listos. Modifícalos abajo y guarda tu preset en el campo.",
+        BtnSavePreset = "Guardar los actuales como preset",
+        BtnDeletePreset = "Eliminar preset",
+        PresetNameHelp = "Nombre del preset propio:",
+
+        -- Sección 8
+        HeaderActions = "Acciones rápidas",
+        HeaderDebug = "Depuración",
+        HeaderStates = "Estados FSM",
+        StatesHelp = "Desactivado = el bot pasa a idle en vez del estado. Idle no se puede desactivar.",
+        BtnSpawnBot = "Generar bot (+1)",
+        BtnSpawnMax = "Llenar el servidor de bots (Máximo)",
+        BtnKickAll = "Expulsar a todos los bots del servidor",
+        BtnRerollNames = "Randomizar los apodos de los bots",
+        BtnReloadNames = "Recargar names.txt desde el disco",
+        BtnRerollAppearance = "Cambiar apariencia de los bots",
+        BtnReloadAI = "Reiniciar la IA de todos los bots",
+        BtnNavGen = "Generar navmesh (nav_generate)",
+        BtnReset = "Restablecer todos los ajustes por defecto",
+        BtnSaveBots = "Guardar bots (traslado de mapa)",
+        BtnRestoreBots = "Restaurar bots guardados",
+        TeleportHelp = "--- Teletransportes (hay puente ULX: !bringbots, !gotobot) ---",
+        BtnBringBots = "Traer a TODOS los bots hacia mí",
+        BotNickHelp = "Apodo del bot (vale parcial):",
+        BtnBringOne = "Traer a este bot",
+        BtnGotoBot = "Teletransportarse al bot",
+        BtnBotInfo = "Info de todos los bots (a consola)",
+        BtnBotInfoOne = "Info de este bot (a consola)",
+        ESPHelp = "--- ESP (cajas + info, solo admins) ---",
+        ESPEnabled = "ESP de bots",
+        ESPSkeleton = "Esqueletos en ESP",
+        ESPBoxes = "ESP: cajas",
+        ESPHP = "ESP: barra de vida",
+        ESPInfo = "ESP: líneas de info",
+        ESPStatus = "ESP: estados y ruta",
+    },
+    pt = {
+        MenuTitle = "GeminiBots - Gerenciamento de bots",
+        MenuDesc = "Configuração em tempo real da IA dos bots padrão.",
+
+        LangButton = "Idioma: PORTUGUÊS BR (clique: auto -> RU -> UK -> ES -> PT -> EN)",
+
+        -- Seção 1
+        HeaderGeneral = "Configurações gerais",
+        Enabled = "Ativar a IA dos bots",
+        CustomNames = "Apelidos personalizados únicos para bots",
+        PreserveBots = "Restaurar bots ao trocar de mapa",
+        HeaderAppearance = "Aparência",
+        Appearance = "Aparência aleatória dos bots (modelos/skins)",
+        AppearanceModel = "Modelos de jogador aleatórios",
+        AppearanceSkin = "Skins de modelo aleatórias",
+        AppearanceBodygroups = "Bodygroups aleatórios",
+        AppearanceColor = "Cor de jogador aleatória",
+        AppearanceRespawn = "Mudar aparência a cada renascimento",
+        Debug = "Modo de depuração (saída no console)",
+        DebugDraw = "Desenho de depuração no mundo (trajetórias, caminhos)",
+
+        -- Seção 2
+        HeaderLoadout = "Seleção de armas dos bots (Loadout & SWEPs)",
+        LoadoutEnabled = "Dar armas aleatórias ao nascer",
+        LoadoutStrip = "Remover ferramentas padrão (Sandbox)",
+        LoadoutMin = "Nº mínimo de armas",
+        LoadoutMax = "Nº máximo de armas",
+        LoadoutAmmo = "Quantidade de munição de reserva",
+        PresetHeader = "--- Presets rápidos do arsenal ---",
+        PresetAll = "Ativar TODAS as armas",
+        PresetHL2 = "Somente HL2 padrão",
+        PresetM9K = "Todo o M9K (escanear servidor)",
+        PresetPistols = "Somente pistolas",
+        PresetRifles = "Somente fuzis e SMGs",
+        PresetShotguns = "Somente escopetas",
+        PresetSnipers = "Somente snipers",
+        PresetNone = "Desativar tudo",
+        WeaponListHeader = "--- Lista de armas do pool (Marque as desejadas) ---",
+        WeaponNotInstalled = " [NÃO INSTALADA NO SERVIDOR]",
+        AddWeaponHelp = "Adicionar arma pelo nome da classe (ex.: m9k_vector):",
+        BtnAddWeapon = "Adicionar arma ao pool (+)",
+        BtnAddHeldWeapon = "Pegar a arma da mão e adicionar ao pool dos bots",
+        BtnGiveHeldWeapon = "Entregar instantaneamente a arma da mão a todos os bots",
+        BtnReloadWeapons = "Recarregar weapons.txt do disco",
+        BtnOpenArsenal = "ABRIR ARSENAL: escaneio + busca + filtros",
+        WPackHeader = "--- Packs de armas (adaptadores de tática) ---",
+        WPackFound = "detectado",
+        WPackMissing = "não está no servidor",
+        C4Enabled = "Bots plantam e desarmam C4 (precisa do SWCS)",
+
+        -- Seção 3
+        HeaderChat = "Chat e reações dos bots",
+        ChatEnabled = "Permitir que os bots escrevam no chat",
+        SmartContext = "Contexto inteligente de frases (K/D, sequências e cheats)",
+        ChatKillChance = "Chance de deboche após eliminação",
+        ChatDeathChance = "Chance de desculpa após a morte",
+        ChatComebackChance = "Chance de resposta à acusação de um bot",
+        ChatTauntChance = "Chance de provocação em combate (mira/camper)",
+        FileLog = "Escrever log detalhado em arquivo (data/geminibots/logs/debug.log)",
+        PacksHeader = "--- Packs de texto de frases (.txt) ---",
+        PacksHelp = "Arquivos: garrysmod/data/geminibots/chat/\n(Marque com caixas os packs desejados):",
+        PackStats = "%s  [Eliminações: %d | Mortes: %d]",
+        BtnReloadPacks = "Recarregar packs .txt do disco",
+
+        -- Seção 4
+        HeaderPerception = "Sentidos, visão e memória",
+        VisionFOV = "Campo de visão (FOV em graus)",
+        VisionRange = "Alcance máximo de visão (unidades)",
+        HearingRange = "Alcance auditivo de passos atrás de paredes (unidades)",
+        GunHearingRange = "Alcance auditivo de tiros pelo mapa (unidades)",
+        MemoryDuration = "Memória do alvo atrás de uma parede (seg)",
+        TargetModeHeader = "--- Modo de alvos (quem atacar) ---",
+        TargetBoth = "Todos indistintamente",
+        TargetPvE = "PvE: NPCs primeiro",
+        TargetPlayers = "Somente jogadores",
+        TargetNPCs = "Somente NPCs",
+
+        -- Seção 5
+        HeaderCombat = "Mira e IA de combate",
+        ReactionMin = "Atraso mínimo de reação (seg)",
+        ReactionMax = "Atraso máximo de reação (seg)",
+        AimSpeed = "Velocidade de giro da mira",
+        AimSmoothing = "Suavização da mira (Lerp)",
+        AimPrediction = "Antecipação do movimento do alvo (Lead Aim)",
+        AimSpread = "Dispersão/erro de mira (graus)",
+        HeadshotChance = "Chance de mirar na cabeça",
+        CombatMinDist = "Distância mínima de combate (recuar)",
+        CombatMaxDist = "Distância máxima de combate (aproximar)",
+        FleeHealth = "Limiar de fuga (% de vida)",
+        Wallbang = "Atirar através de vidro/frágil (wallbang)",
+
+        HeaderSWCS = "SWCS: iscas, flash, fogo",
+        SWCSHelp = "Iscas (decoy): investigar o som com chance (senão ignora). O flash do SWCS cega e ensurdece sempre. Fogo de molotov: afastar-se para o lado.",
+        DecoyChance = "Chance de investigar o som de uma isca",
+        FireAvoid = "Afastar-se do fogo do molotov",
+        FireRadius = "Raio de reação ao fogo (unidades)",
+
+        -- Seção 6
+        HeaderMovement = "Movimento e bunny-hop",
+        BunnyHop = "Bunny-hop ao andar (e sem inimigos)",
+        BunnyHopChance = "Chance de pulo ao aterrissar",
+
+        -- Seção 7
+        HeaderDifficulty = "Presets de dificuldade",
+        DifficultyHelp = "Configurações prontas. Ajuste abaixo e salve seu preset pelo campo.",
+        BtnSavePreset = "Salvar as atuais como preset",
+        BtnDeletePreset = "Excluir preset",
+        PresetNameHelp = "Nome do seu preset:",
+
+        -- Seção 8
+        HeaderActions = "Ações rápidas",
+        HeaderDebug = "Depuração",
+        HeaderStates = "Estados da FSM",
+        StatesHelp = "Desligado = o bot vai para idle em vez do estado. Idle não pode ser desligado.",
+        BtnSpawnBot = "Criar bot (+1)",
+        BtnSpawnMax = "Encher o servidor de bots (Máximo)",
+        BtnKickAll = "Remover todos os bots do servidor",
+        BtnRerollNames = "Randomizar os apelidos dos bots",
+        BtnReloadNames = "Recarregar names.txt do disco",
+        BtnRerollAppearance = "Mudar a aparência dos bots",
+        BtnReloadAI = "Reiniciar a IA de todos os bots",
+        BtnNavGen = "Gerar navmesh (nav_generate)",
+        BtnReset = "Restaurar todas as configurações padrão",
+        BtnSaveBots = "Salvar bots (transferência de mapa)",
+        BtnRestoreBots = "Restaurar bots salvos",
+        TeleportHelp = "--- Teleportes (há ponte ULX: !bringbots, !gotobot) ---",
+        BtnBringBots = "Trazer TODOS os bots até mim",
+        BotNickHelp = "Apelido do bot (parcial serve):",
+        BtnBringOne = "Trazer este bot",
+        BtnGotoBot = "Teleportar-se até o bot",
+        BtnBotInfo = "Info de todos os bots (no console)",
+        BtnBotInfoOne = "Info deste bot (no console)",
+        ESPHelp = "--- ESP (caixas + info, só admins) ---",
+        ESPEnabled = "ESP dos bots",
+        ESPSkeleton = "Esqueletos no ESP",
+        ESPBoxes = "ESP: caixas",
+        ESPHP = "ESP: barra de HP",
+        ESPInfo = "ESP: linhas de info",
+        ESPStatus = "ESP: status e caminho",
     }
 }
 
--- Текущий язык клиента: ручной выбор (ru/en) либо вживую из GMod
+-- Текущий язык клиента: ручной выбор либо вживую из GMod
 local currentLang = "ru"
 
+-- Доступные языки меню (коды). "pt-br" из конвара нормализуется в "pt"
+GeminiBots.MENU_LANGS = { "ru", "uk", "es", "pt", "en" }
+
 local function T(key)
-    local langTable = PHRASES[GeminiBots.GetMenuLang()] or PHRASES.ru
+    local langTable = PHRASES[GeminiBots.GetMenuLang()] or PHRASES.en or PHRASES.ru
     return langTable[key] or key
+end
+
+-- Строка по языку меню: t = { ru = "..", uk = "..", es = "..", pt = "..", en = ".." }.
+-- Своей строки нет — берем английскую. Клиентские файлы грузятся после cl_qmenu,
+-- поэтому хелпер доступен всей теме, арсеналу и ESP
+function GeminiBots.LangStr(t)
+    local lang = GeminiBots.GetMenuLang()
+    return t[lang] or t.en or t.ru or ""
 end
 
 -- Построение меню настроек
@@ -519,7 +950,9 @@ local function BuildSettingsMenu(panel, tab, opts)
         for _, entry in ipairs(GeminiBots.CachedSkillPresets) do
             if entry.custom then
                 local presetId = entry.id
-                local customTag = (GeminiBots.GetMenuLang() == "ru") and "свой" or "custom"
+                local customTag = GeminiBots.LangStr{
+                    ru = "свой", uk = "свій", es = "personalizado",
+                    pt = "personalizado", en = "custom" }
                 defs[#defs + 1] = { label = presetId .. " (" .. customTag .. ")", fn = function()
                     net.Start("GeminiBots_ApplySkillPreset")
                     net.WriteString(presetId)
@@ -681,14 +1114,21 @@ end)
 hook.Add("PopulateToolMenu", "GeminiBots_PopulateToolMenu", function()
     local function MakeOpener(pnl)
         pnl:ClearControls()
-        local ru = GeminiBots.GetMenuLang() == "ru"
-        pnl:Help(ru and "Все настройки переехали в отдельное окно."
-            or "All settings moved to the standalone window.")
-        local btn = pnl:Button(ru and "ОТКРЫТЬ МЕНЮ" or "OPEN MENU")
+        pnl:Help(GeminiBots.LangStr{
+            ru = "Все настройки переехали в отдельное окно.",
+            uk = "Усі налаштування переїхали в окреме вікно.",
+            es = "Todos los ajustes se movieron a la ventana independiente.",
+            pt = "Todas as configurações foram para a janela separada.",
+            en = "All settings moved to the standalone window." })
+        local btn = pnl:Button(GeminiBots.LangStr{
+            ru = "ОТКРЫТЬ МЕНЮ", uk = "ВІДКРИТИ МЕНЮ",
+            es = "ABRIR MENÚ", pt = "ABRIR MENU", en = "OPEN MENU" })
         btn.DoClick = function()
             RunConsoleCommand("geminibots_menu")
         end
-        local btnArs = pnl:Button(ru and "ОТКРЫТЬ АРСЕНАЛ" or "OPEN ARSENAL")
+        local btnArs = pnl:Button(GeminiBots.LangStr{
+            ru = "ОТКРЫТЬ АРСЕНАЛ", uk = "ВІДКРИТИ АРСЕНАЛ",
+            es = "ABRIR ARSENAL", pt = "ABRIR ARSENAL", en = "OPEN ARSENAL" })
         btnArs.DoClick = function()
             RunConsoleCommand("geminibots_weapons_menu")
         end
@@ -730,10 +1170,16 @@ end
 function GeminiBots.GetMenuLang()
     local cv = GetConVar("geminibots_menu_lang")
     local v = cv and string.lower(cv:GetString() or "auto") or "auto"
-    if v == "ru" or v == "en" then return v end
+    if v == "pt-br" then v = "pt" end
+    for _, m in ipairs(GeminiBots.MENU_LANGS or {}) do
+        if v == m then return v end
+    end
     -- Авто: язык берем из GMod вживую — чел с англ. игрой сразу видит EN
-    local gl = GetConVar("gmod_language") and GetConVar("gmod_language"):GetString() or ""
-    if string.find(string.lower(gl), "ru") then return "ru" end
+    local gl = string.lower(GetConVar("gmod_language") and GetConVar("gmod_language"):GetString() or "")
+    if string.find(gl, "ukrain") then return "uk" end
+    if string.find(gl, "ru") then return "ru" end
+    if string.find(gl, "spa") or string.find(gl, "espan") then return "es" end
+    if string.find(gl, "portug") or string.find(gl, "^br") then return "pt" end
     return "en"
 end
 
@@ -741,19 +1187,22 @@ end
 function GeminiBots.MenuLangMode()
     local cv = GetConVar("geminibots_menu_lang")
     local v = cv and string.lower(cv:GetString() or "auto") or "auto"
-    if v == "ru" or v == "en" then return v end
+    if v == "pt-br" then v = "pt" end
+    for _, m in ipairs(GeminiBots.MENU_LANGS or {}) do
+        if v == m then return v end
+    end
     return "auto"
 end
 
 function GeminiBots.ToggleMenuLang()
-    -- авто -> ru -> en -> авто, выбор запоминается конваром
-    local order = { "auto", "ru", "en" }
+    -- авто -> ru -> uk -> es -> pt -> en -> авто, выбор запоминается конваром
+    local order = { "auto", "ru", "uk", "es", "pt", "en" }
     local cur = GeminiBots.MenuLangMode()
-    local next = "auto"
+    local nextLang = "auto"
     for i, m in ipairs(order) do
-        if m == cur then next = order[(i % #order) + 1] break end
+        if m == cur then nextLang = order[(i % #order) + 1] break end
     end
-    RunConsoleCommand("geminibots_menu_lang", next)
+    RunConsoleCommand("geminibots_menu_lang", nextLang)
     currentLang = GeminiBots.GetMenuLang()
     return currentLang
 end

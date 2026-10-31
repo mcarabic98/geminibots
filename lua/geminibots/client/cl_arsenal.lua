@@ -61,11 +61,7 @@ net.Receive("GeminiBots_ReceiveArsenal", function()
     end
 end)
 
--- Локализация заголовков окна
-local function IsRU()
-    local lang = GetConVar("gmod_language") and GetConVar("gmod_language"):GetString() or "ru"
-    return string.find(string.lower(lang), "ru") ~= nil
-end
+-- Локализация заголовков окна берется вживую из GeminiBots.LangStr
 
 -- Подписи типов оружия для фильтров и строк
 local WTYPE_RU = {
@@ -80,9 +76,31 @@ local WTYPE_EN = {
     melee = "Melee", grenade = "Grenades", tactical = "Tactical",
     special = "Special", other = "Other"
 }
+local WTYPE_UK = {
+    All = "Усі", rifle = "Гвинтівки", smg = "ПП", pistol = "Пістолети",
+    shotgun = "Дробовики", sniper = "Снайперки", mg = "Кулемети",
+    melee = "Рукопаш", grenade = "Гранати", tactical = "Тактика",
+    special = "Спец.", other = "Інше"
+}
+local WTYPE_ES = {
+    All = "Todas", rifle = "Fusiles", smg = "SMG", pistol = "Pistolas",
+    shotgun = "Escopetas", sniper = "Francotiradoras", mg = "Ametralladoras",
+    melee = "Cuerpo a cuerpo", grenade = "Granadas", tactical = "Tácticas",
+    special = "Especiales", other = "Otras"
+}
+local WTYPE_PT = {
+    All = "Todas", rifle = "Fuzis", smg = "SMGs", pistol = "Pistolas",
+    shotgun = "Escopetas", sniper = "Snipers", mg = "Metralhadoras",
+    melee = "Corpo a corpo", grenade = "Granadas", tactical = "Táticas",
+    special = "Especiais", other = "Outras"
+}
 
-local function TypeLabel(key, ru)
-    local t = ru and WTYPE_RU or WTYPE_EN
+local WTYPE_BY_LANG = {
+    ru = WTYPE_RU, uk = WTYPE_UK, es = WTYPE_ES, pt = WTYPE_PT, en = WTYPE_EN
+}
+
+local function TypeLabel(key, lang)
+    local t = WTYPE_BY_LANG[lang or GeminiBots.GetMenuLang()] or WTYPE_EN
     return t[key] or key
 end
 
@@ -128,10 +146,9 @@ function GeminiBots.OpenArsenal()
         return GeminiBots.ArsenalFrame
     end
 
-    local ru = IsRU()
     local T = GeminiBots.Theme
-    -- Язык читаем вживую из настроек, а не запоминаем при открытии
-    local function LiveRU() return GeminiBots.GetMenuLang() == "ru" end
+    -- Строка по языку меню: { ru=..., uk=..., es=..., pt=..., en=... }
+    local function L(t) return GeminiBots.LangStr(t) end
     local frame = vgui.Create("DFrame")
     frame:SetTitle("")
     frame:ShowCloseButton(false)
@@ -155,7 +172,10 @@ function GeminiBots.OpenArsenal()
         local c = T.Corner()
         draw.RoundedBox(c, 0, 0, w, h, T.Colors.bg)
         draw.RoundedBoxEx(c, 0, 0, w, 46, T.Colors.header, true, true, false, false)
-        GeminiBots.Theme.DrawSpaced(LiveRU() and "GeminiBots — Арсенал ботов" or "GeminiBots — Bot Arsenal",
+        GeminiBots.Theme.DrawSpaced(L{
+            ru = "GeminiBots — Арсенал ботов", uk = "GeminiBots — Арсенал ботів",
+            es = "GeminiBots — Arsenal de bots", pt = "GeminiBots — Arsenal dos bots",
+            en = "GeminiBots — Bot Arsenal" },
             "GeminiTitle", 16, 23, T.Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
     end
 
@@ -241,8 +261,10 @@ function GeminiBots.OpenArsenal()
     search.GeminiValue = ""
     -- Плейсхолдер сразу по языку: до первого переключения языка он был
     -- жестко русским и в английском интерфейсе
-    search.GeminiPlaceholder = LiveRU() and "Поиск по классу или названию..."
-        or "Search class or name..."
+    search.GeminiPlaceholder = L{
+        ru = "Поиск по классу или названию...", uk = "Пошук за класом або назвою...",
+        es = "Buscar por clase o nombre...", pt = "Buscar por classe ou nome...",
+        en = "Search class or name..." }
     function search:Paint(w, h)
         self.hover = Lerp(FrameTime() * 12, self.hover or 0, self:IsHovered() and 1 or 0)
         draw.RoundedBox(math.min(T.Corner(), math.floor(h / 2)), 0, 0, w, h,
@@ -262,14 +284,18 @@ function GeminiBots.OpenArsenal()
     end
     OnLang(function()
         if IsValid(search) then
-            search.GeminiPlaceholder = LiveRU() and "Поиск по классу или названию..."
-                or "Search class or name..."
+            search.GeminiPlaceholder = L{
+                ru = "Поиск по классу или названию...", uk = "Пошук за класом або назвою...",
+                es = "Buscar por clase o nombre...", pt = "Buscar por classe ou nome...",
+                en = "Search class or name..." }
         end
     end)
     search.DoClick = function()
         T.ClickSound()
         local old = search.GeminiValue or ""
-        T.AskText(LiveRU() and "Поиск" or "Search", old, false,
+        T.AskText(L{
+            ru = "Поиск", uk = "Пошук", es = "Buscar",
+            pt = "Buscar", en = "Search" }, old, false,
             function(v)
                 search.GeminiValue = v or ""
                 frame.SearchText = string.lower(v or "")
@@ -307,8 +333,8 @@ function GeminiBots.OpenArsenal()
     typeBox:Dock(LEFT)
     typeBox:SetWide(150)
     typeBox:DockMargin(8, 0, 0, 0)
-    typeBox:SetValue(TypeLabel("All", LiveRU()))
-    typeBox:AddChoice(TypeLabel("All", LiveRU()), "All")
+    typeBox:SetValue(TypeLabel("All"))
+    typeBox:AddChoice(TypeLabel("All"), "All")
     T.StyleComboFace(typeBox)
     typeBox.OnSelect = function(_, _, _, key)
         frame.TypeFilter = key or "All"
@@ -322,7 +348,9 @@ function GeminiBots.OpenArsenal()
     chkEnabled:SetTextColor(T.Colors.muted)
     OnLang(function()
         if IsValid(chkEnabled) then
-            chkEnabled:SetText(LiveRU() and "Только включённые" or "Enabled only")
+            chkEnabled:SetText(L{
+                ru = "Только включённые", uk = "Лише увімкнені",
+                es = "Solo activadas", pt = "Somente ativas", en = "Enabled only" })
         end
     end)
     chkEnabled:SetValue(0)
@@ -338,8 +366,16 @@ function GeminiBots.OpenArsenal()
     chkMissing:SetTextColor(T.Colors.muted)
     OnLang(function()
         if IsValid(chkMissing) then
-            chkMissing:SetText(LiveRU() and "Показать отсутствующие" or "Show missing")
-            chkMissing:SetTooltip(LiveRU() and "Записи из weapons.txt, которых нет на сервере" or "weapons.txt entries not installed")
+            chkMissing:SetText(L{
+                ru = "Показать отсутствующие", uk = "Показати відсутні",
+                es = "Mostrar no instaladas", pt = "Mostrar não instaladas",
+                en = "Show missing" })
+            chkMissing:SetTooltip(L{
+                ru = "Записи из weapons.txt, которых нет на сервере",
+                uk = "Записи з weapons.txt, яких немає на сервері",
+                es = "Entradas de weapons.txt no instaladas en el servidor",
+                pt = "Entradas do weapons.txt não instaladas no servidor",
+                en = "weapons.txt entries not installed" })
         end
     end)
     chkMissing:SetValue(0)
@@ -354,7 +390,9 @@ function GeminiBots.OpenArsenal()
     btnRescan:DockMargin(8, 0, 0, 0)
     OnLang(function()
         if IsValid(btnRescan) then
-            btnRescan:SetText(LiveRU() and "Скан" or "Rescan")
+            btnRescan:SetText(L{
+                ru = "Скан", uk = "Скан", es = "Escanear",
+                pt = "Escanear", en = "Rescan" })
         end
     end)
     btnRescan.DoClick = function()
@@ -376,19 +414,22 @@ function GeminiBots.OpenArsenal()
     presetLabel:SetTextColor(T.Colors.muted)
     OnLang(function()
         if IsValid(presetLabel) then
-            presetLabel:SetText(LiveRU() and "Тип:" or "Type:")
+            presetLabel:SetText(L{
+                ru = "Тип:", uk = "Тип:", es = "Tipo:",
+                pt = "Tipo:", en = "Type:" })
         end
     end)
 
-    local function PresetBtn(ruText, enText, preset)
+    -- texts — таблица по языкам { ru=..., uk=..., es=..., pt=..., en=... }
+    local function PresetBtn(texts, preset)
         local b = vgui.Create("DButton", presets)
         b:Dock(LEFT)
         b:SetWide(90)
         b:DockMargin(0, 0, 4, 0)
-        b:SetText(LiveRU() and ruText or enText)
+        b:SetText(L(texts))
         OnLang(function()
             if IsValid(b) then
-                b:SetText(LiveRU() and ruText or enText)
+                b:SetText(L(texts))
             end
         end)
         b.DoClick = function()
@@ -400,15 +441,21 @@ function GeminiBots.OpenArsenal()
         return b
     end
 
-    PresetBtn("HL2", "HL2", "hl2")
-    PresetBtn("M9K", "M9K", "m9k")
-    PresetBtn("Пистолеты", "Pistols", "pistols")
-    PresetBtn("Винтовки", "Rifles", "rifles")
-    PresetBtn("Дробь", "Shotguns", "shotguns")
-    PresetBtn("Снайп.", "Snipers", "snipers")
+    PresetBtn({ ru = "HL2", uk = "HL2", es = "HL2", pt = "HL2", en = "HL2" }, "hl2")
+    PresetBtn({ ru = "M9K", uk = "M9K", es = "M9K", pt = "M9K", en = "M9K" }, "m9k")
+    PresetBtn({ ru = "Пистолеты", uk = "Пістолети", es = "Pistolas",
+        pt = "Pistolas", en = "Pistols" }, "pistols")
+    PresetBtn({ ru = "Винтовки", uk = "Гвинтівки", es = "Fusiles",
+        pt = "Fuzis", en = "Rifles" }, "rifles")
+    PresetBtn({ ru = "Дробь", uk = "Дріб", es = "Escopetas",
+        pt = "Escopetas", en = "Shotguns" }, "shotguns")
+    PresetBtn({ ru = "Снайп.", uk = "Снайп.", es = "Snipers",
+        pt = "Snipers", en = "Snipers" }, "snipers")
     -- Массовые действия отдельно справа от фильтров типов
-    local bOff = PresetBtn("ВЫКЛ", "OFF", "none")
-    local bAll = PresetBtn("ВСЁ", "ALL", "all")
+    local bOff = PresetBtn({ ru = "ВЫКЛ", uk = "ВИКЛ", es = "APAGAR",
+        pt = "DESLIGAR", en = "OFF" }, "none")
+    local bAll = PresetBtn({ ru = "ВСЁ", uk = "ВСЕ", es = "TODAS",
+        pt = "TODAS", en = "ALL" }, "all")
     bOff:Dock(RIGHT)
     bAll:Dock(RIGHT)
     bOff:DockMargin(0, 0, 0, 0)
@@ -431,8 +478,13 @@ function GeminiBots.OpenArsenal()
     frame.CountLabel = countLabel
 
     local bulkDefs = {
-        { label = LiveRU() and "Вкл. видимые" or "Enable visible",
-          tip = LiveRU() and "Включить всё видимое в списке" or "Enable all listed",
+        { label = L{
+            ru = "Вкл. видимые", uk = "Увімк. видимі", es = "Activar visibles",
+            pt = "Ativar visíveis", en = "Enable visible" },
+          tip = L{
+            ru = "Включить всё видимое в списке", uk = "Увімкнути все видиме у списку",
+            es = "Activar todo lo visible en la lista", pt = "Ativar tudo que está visível na lista",
+            en = "Enable all listed" },
           fn = function()
             local visible = frame:GetVisibleClasses()
             if #visible == 0 then return end
@@ -442,8 +494,13 @@ function GeminiBots.OpenArsenal()
             end
             SendBulk(payload)
         end },
-        { label = LiveRU() and "Выкл. видимые" or "Disable visible",
-          tip = LiveRU() and "Выключить всё видимое в списке" or "Disable all listed",
+        { label = L{
+            ru = "Выкл. видимые", uk = "Вимк. видимі", es = "Desactivar visibles",
+            pt = "Desativar visíveis", en = "Disable visible" },
+          tip = L{
+            ru = "Выключить всё видимое в списке", uk = "Вимкнути все видиме у списку",
+            es = "Desactivar todo lo visible en la lista", pt = "Desativar tudo que está visível na lista",
+            en = "Disable all listed" },
           fn = function()
             local visible = frame:GetVisibleClasses()
             if #visible == 0 then return end
@@ -459,12 +516,22 @@ function GeminiBots.OpenArsenal()
     OnLang(function()
         local btns = frame.BulkBtns or {}
         if IsValid(btns[1]) then
-            btns[1].btnLabel = LiveRU() and "Вкл. видимые" or "Enable visible"
-            T.Tooltip(btns[1], LiveRU() and "Включить всё видимое в списке" or "Enable all listed")
+            btns[1].btnLabel = L{
+                ru = "Вкл. видимые", uk = "Увімк. видимі", es = "Activar visibles",
+                pt = "Ativar visíveis", en = "Enable visible" }
+            T.Tooltip(btns[1], L{
+                ru = "Включить всё видимое в списке", uk = "Увімкнути все видиме у списку",
+                es = "Activar todo lo visible en la lista", pt = "Ativar tudo que está visível na lista",
+                en = "Enable all listed" })
         end
         if IsValid(btns[2]) then
-            btns[2].btnLabel = LiveRU() and "Выкл. видимые" or "Disable visible"
-            T.Tooltip(btns[2], LiveRU() and "Выключить всё видимое в списке" or "Disable all listed")
+            btns[2].btnLabel = L{
+                ru = "Выкл. видимые", uk = "Вимк. видимі", es = "Desactivar visibles",
+                pt = "Desativar visíveis", en = "Disable visible" }
+            T.Tooltip(btns[2], L{
+                ru = "Выключить всё видимое в списке", uk = "Вимкнути все видиме у списку",
+                es = "Desactivar todo lo visible en la lista", pt = "Desativar tudo que está visível na lista",
+                en = "Disable all listed" })
         end
     end)
 
@@ -528,9 +595,9 @@ function GeminiBots.OpenArsenal()
         end
         if IsValid(self.TypeBox) then
             self.TypeBox:Clear()
-            self.TypeBox:AddChoice(TypeLabel("All", LiveRU()), "All")
-            for _, t in ipairs(types) do self.TypeBox:AddChoice(TypeLabel(t, LiveRU()), t) end
-            self.TypeBox:SetValue(TypeLabel(self.TypeFilter or "All", LiveRU()))
+            self.TypeBox:AddChoice(TypeLabel("All"), "All")
+            for _, t in ipairs(types) do self.TypeBox:AddChoice(TypeLabel(t), t) end
+            self.TypeBox:SetValue(TypeLabel(self.TypeFilter or "All"))
         end
     end
 
@@ -547,11 +614,12 @@ function GeminiBots.OpenArsenal()
         end
 
         if IsValid(self.CountLabel) then
-            if LiveRU() then
-                self.CountLabel:SetText(string.format("Показано: %d/%d · Вкл: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount))
-            else
-                self.CountLabel:SetText(string.format("Shown: %d/%d · On: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount))
-            end
+            self.CountLabel:SetText(L{
+                ru = string.format("Показано: %d/%d · Вкл: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount),
+                uk = string.format("Показано: %d/%d · Увімк: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount),
+                es = string.format("Mostradas: %d/%d · Activas: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount),
+                pt = string.format("Mostradas: %d/%d · Ativas: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount),
+                en = string.format("Shown: %d/%d · On: %d", #data, #(GeminiBots.CachedArsenal or {}), enabledCount) })
         end
 
         for _, e in ipairs(data) do
@@ -584,12 +652,27 @@ function GeminiBots.OpenArsenal()
             chk:SetWide(430)
             chk:SetFont("GeminiSmall")
             chk:SetTextColor(rowText)
-            local lru = LiveRU()
+            local lang = GeminiBots.GetMenuLang()
             local label = string.format("[%s] %s <%s>",
-                entry.pack or "?", entry.name or "", TypeLabel(entry.wtype or "other", lru))
-            if entry.available == false then label = label .. (lru and " [НЕТ НА СЕРВЕРЕ]" or " [MISSING]") end
-            if entry.compatible == false then label = label .. (lru and " [НЕ ДЛЯ БОТОВ]" or " [BOT-INCOMPATIBLE]") end
-            if entry.broken then label = label .. (lru and " [ОШИБКА]" or " [BROKEN]") end
+                entry.pack or "?", entry.name or "", TypeLabel(entry.wtype or "other", lang))
+            if entry.available == false then
+                label = label .. ({
+                    ru = " [НЕТ НА СЕРВЕРЕ]", uk = " [НЕМАЄ НА СЕРВЕРІ]",
+                    es = " [NO INSTALADA]", pt = " [NÃO INSTALADA]",
+                    en = " [MISSING]" })[lang or "en"]
+            end
+            if entry.compatible == false then
+                label = label .. ({
+                    ru = " [НЕ ДЛЯ БОТОВ]", uk = " [НЕ ДЛЯ БОТІВ]",
+                    es = " [NO PARA BOTS]", pt = " [INCOMPATÍVEL COM BOTS]",
+                    en = " [BOT-INCOMPATIBLE]" })[lang or "en"]
+            end
+            if entry.broken then
+                label = label .. ({
+                    ru = " [ОШИБКА]", uk = " [ПОМИЛКА]",
+                    es = " [ROTO]", pt = " [COM ERRO]",
+                    en = " [BROKEN]" })[lang or "en"]
+            end
             chk:SetText(label)
             chk:SetValue(entry.active and 1 or 0)
             chk:SetTooltip(entry.class)
@@ -619,7 +702,10 @@ function GeminiBots.OpenArsenal()
                 btnDel:Dock(RIGHT)
                 btnDel:SetWide(70)
                 btnDel:SetText("X")
-                btnDel:SetTooltip(LiveRU() and "Удалить из weapons.txt" or "Remove from weapons.txt")
+                btnDel:SetTooltip(L{
+                    ru = "Удалить из weapons.txt", uk = "Видалити з weapons.txt",
+                    es = "Eliminar de weapons.txt", pt = "Remover do weapons.txt",
+                    en = "Remove from weapons.txt" })
                 local delClass = entry.class
                 btnDel.DoClick = function()
                     net.Start("GeminiBots_RemoveWeapon")

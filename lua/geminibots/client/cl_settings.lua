@@ -13,18 +13,18 @@ GeminiBots.SettingsFrame = GeminiBots.SettingsFrame or nil
 
 local FIT_TIMER = "GeminiBots_SettingsFit"
 
-local function IsRU()
-    local lang = GetConVar("gmod_language") and GetConVar("gmod_language"):GetString() or "ru"
-    return string.find(string.lower(lang), "ru") ~= nil
+-- Строка по языку меню: { ru=..., uk=..., es=..., pt=..., en=... }, нет своей — английская
+local function L(t)
+    return GeminiBots.LangStr(t)
 end
 
 local TABS = {
-    { id = "main", ru = "Основные", en = "Main", icon = "cog" },
-    { id = "weapons", ru = "Оружие", en = "Weapons", icon = "gun" },
-    { id = "combat", ru = "Бой и движение", en = "Combat", icon = "bomb" },
-    { id = "admin", ru = "Админ", en = "Admin", icon = "shield" },
-    { id = "menu", ru = "Меню", en = "Menu", icon = "palette" },
-    { id = "about", ru = "Об аддоне", en = "About", icon = "info" },
+    { id = "main", ru = "Основные", uk = "Основні", es = "General", pt = "Geral", en = "Main", icon = "cog" },
+    { id = "weapons", ru = "Оружие", uk = "Зброя", es = "Armas", pt = "Armas", en = "Weapons", icon = "gun" },
+    { id = "combat", ru = "Бой и движение", uk = "Бій і рух", es = "Combate", pt = "Combate", en = "Combat", icon = "bomb" },
+    { id = "admin", ru = "Админ", uk = "Адмін", es = "Admin", pt = "Admin", en = "Admin", icon = "shield" },
+    { id = "menu", ru = "Меню", uk = "Меню", es = "Interfaz", pt = "Interface", en = "Menu", icon = "palette" },
+    { id = "about", ru = "Об аддоне", uk = "Про аддон", es = "Acerca de", pt = "Sobre", en = "About", icon = "info" },
 }
 
 -- Шимы методов панели под интерфейс построителя меню (темные контролы)
@@ -125,7 +125,6 @@ end
 function GeminiBots.BuildAboutTabInner(frame, form)
     form:ClearControls()
     local T = GeminiBots.Theme
-    local ru = (GeminiBots.GetMenuLang() == "ru")
     form.GeminiIsMenuTab = true
     GeminiBots.SetSettingsTarget(form, "about", { noSharedHeader = true })
 
@@ -137,17 +136,32 @@ function GeminiBots.BuildAboutTabInner(frame, form)
         T.DrawLogo(T.LogoVariant(), 8, math.floor((h - 40) / 2), 40, T.Colors.accent)
         T.DrawSpaced("GeminiBots", "GeminiHeader", 58, math.floor(h / 2) - 10,
             T.Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1)
-        T.DrawSpaced(ru and "Живые боты для Garry's Mod" or "Smarter bots for Garry's Mod",
+        T.DrawSpaced(L{
+        ru = "Живые боты для Garry's Mod", uk = "Живі боти для Garry's Mod",
+        es = "Bots vivos para Garry's Mod", pt = "Bots vivos para Garry's Mod",
+        en = "Smarter bots for Garry's Mod" },
             "GeminiSmall", 59, math.floor(h / 2) + 12,
             T.Colors.muted, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1)
     end
 
-    T.MutedLabel(form, ru and "Версия: 1.0.0" or "Version: 1.0.0")
-    T.MutedLabel(form, ru and "Автор: mcarabic98" or "Author: mcarabic98")
-    T.MutedLabel(form, ru and "Совместная разработка (фуу вайбкод): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (страшные лимиты), Deepsek v4.1 flash (на смену Muse)"
-        or "Co-developed with (eww vibecode): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (scary limits), Deepseek v4.1 flash (replaced Muse)")
-    T.MutedLabel(form, ru and "ИИ стандартных ботов: бой, чувства, чат, оружие, режимы."
-        or "Stock bot AI: combat, senses, chat, weapons, gamemodes.")
+    T.MutedLabel(form, L{
+        ru = "Версия: 1.0.0", uk = "Версія: 1.0.0",
+        es = "Versión: 1.0.0", pt = "Versão: 1.0.0", en = "Version: 1.0.0" })
+    T.MutedLabel(form, L{
+        ru = "Автор: mcarabic98", uk = "Автор: mcarabic98",
+        es = "Autor: mcarabic98", pt = "Autor: mcarabic98", en = "Author: mcarabic98" })
+    T.MutedLabel(form, L{
+        ru = "Совместная разработка (фуу вайбкод): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (страшные лимиты), Deepsek v4.1 flash (на смену Muse)",
+        uk = "Спільна розробка (фуу вайбкод): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (страшні ліміти), Deepsek v4.1 flash (на зміну Muse)",
+        es = "Codesarrollado con (puaj, vibecode): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (límites de miedo), Deepseek v4.1 flash (reemplazó a Muse)",
+        pt = "Codesenvolvido com (aff, vibecode): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (limites assustadores), Deepseek v4.1 flash (no lugar do Muse)",
+        en = "Co-developed with (eww vibecode): Muse Spark 1.3 (rip 17.10.2026), Gemini 3.8 Flash (scary limits), Deepseek v4.1 flash (replaced Muse)" })
+    T.MutedLabel(form, L{
+        ru = "ИИ стандартных ботов: бой, чувства, чат, оружие, режимы.",
+        uk = "ІІ стандартних ботів: бій, почуття, чат, зброя, режими.",
+        es = "IA de los bots estándar: combate, sentidos, chat, armas, modos.",
+        pt = "IA dos bots padrão: combate, sentidos, chat, armas, modos.",
+        en = "Stock bot AI: combat, senses, chat, weapons, gamemodes." })
 
     local btnGH = T.AccentButton(form, "GitHub: mcarabic98/geminibots")
     btnGH.DoClick = function()
@@ -162,7 +176,6 @@ end
 function GeminiBots.BuildMenuTabInner(frame, form)
     form:ClearControls() -- без этого каждый ребилд (смена темы/языка) дописывает копию
     local T = GeminiBots.Theme
-    local ru = (GeminiBots.GetMenuLang() == "ru")
     form.GeminiIsMenuTab = true
     GeminiBots.SetSettingsTarget(form, "menu", { noSharedHeader = true })
 
@@ -174,7 +187,9 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         l.GeminiColor = T.Colors.accent
     end
 
-    header(ru and "Тема оформления" or "Color theme")
+    header(L{
+        ru = "Тема оформления", uk = "Тема оформлення", es = "Tema visual",
+        pt = "Tema visual", en = "Color theme" })
 
     -- Две темы рядом: выбранная залита акцентом (как вкл),
     -- вторая темная (как выкл). Без обводок
@@ -204,8 +219,12 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         end
         return b
     end
-    local btnDark = ThemeBtn(ru and "Тёмная" or "Dark", "dark", cur == "dark")
-    local btnLight = ThemeBtn(ru and "Светлая" or "Light", "light", cur ~= "dark")
+    local btnDark = ThemeBtn(L{
+        ru = "Тёмная", uk = "Темна", es = "Oscura",
+        pt = "Escura", en = "Dark" }, "dark", cur == "dark")
+    local btnLight = ThemeBtn(L{
+        ru = "Светлая", uk = "Світла", es = "Clara",
+        pt = "Clara", en = "Light" }, "light", cur ~= "dark")
     btnDark:Dock(LEFT)
     btnLight:Dock(RIGHT)
     btnDark:DockMargin(0, 0, 4, 0)
@@ -216,7 +235,9 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         btnLight:SetWide(half)
     end
 
-    header(ru and "Акцентный цвет" or "Accent color")
+    header(L{
+        ru = "Акцентный цвет", uk = "Акцентний колір", es = "Color de acento",
+        pt = "Cor de destaque", en = "Accent color" })
 
     -- Пресеты- swatches + свой цвет через миксер
     local swatches = vgui.Create("DPanel", form)
@@ -265,7 +286,9 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         end
     end
     -- Свой цвет на второй половине ряда свотчей
-    btnCustom = T.AccentButton(swatches, ru and "Свой цвет..." or "Custom color...")
+    btnCustom = T.AccentButton(swatches, L{
+        ru = "Свой цвет...", uk = "Свій колір...", es = "Color personalizado...",
+        pt = "Cor personalizada...", en = "Custom color..." })
     btnCustom:Dock(FILL)
     btnCustom:DockMargin(4, 4, 0, 4)
     btnCustom.DoClick = function()
@@ -307,7 +330,10 @@ function GeminiBots.BuildMenuTabInner(frame, form)
             local c = T.Corner()
             draw.RoundedBox(c, 0, 0, w, h, T.Colors.bg)
             draw.RoundedBoxEx(c, 0, 0, w, 44, T.Colors.header, true, true, false, false)
-            T.DrawSpaced(ru and "Свой акцентный цвет" or "Custom accent color",
+            T.DrawSpaced(L{
+                ru = "Свой акцентный цвет", uk = "Свій акцентний колір",
+                es = "Color de acento personalizado", pt = "Cor de destaque personalizada",
+                en = "Custom accent color" },
                 "GeminiTitle", 14, 22, T.Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1)
         end
         -- Крестик: случайно открыл — закрыл
@@ -330,7 +356,9 @@ function GeminiBots.BuildMenuTabInner(frame, form)
             xBtn:SetPos(self:GetWide() - 44, 0)
         end
         -- Кнопка снизу, миксер занимает остальное: без налезания и дыр
-        local okb = T.AccentButton(mf, ru and "Выбрать" or "Pick")
+        local okb = T.AccentButton(mf, L{
+            ru = "Выбрать", uk = "Обрати", es = "Elegir",
+            pt = "Escolher", en = "Pick" })
         okb:Dock(BOTTOM)
         okb:DockMargin(10, 0, 10, 10)
         local mixer = vgui.Create("DColorMixer", mf)
@@ -347,7 +375,9 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         end
     end
 
-    header(ru and "Геометрия" or "Geometry")
+    header(L{
+        ru = "Геометрия", uk = "Геометрія", es = "Geometría",
+        pt = "Geometria", en = "Geometry" })
     -- Выбор шрифта кнопкой-переключателем
     local btnFont = T.AccentButton(form, "")
     btnFont.DoClick = function()
@@ -361,19 +391,36 @@ function GeminiBots.BuildMenuTabInner(frame, form)
         T.BuildFonts()
     end
     btnFont.Think = function(self)
-        self.btnLabel = (ru and "Шрифт: " or "Font: ") .. T.FontFace()
+        self.btnLabel = L{
+            ru = "Шрифт: ", uk = "Шрифт: ", es = "Fuente: ",
+            pt = "Fonte: ", en = "Font: " } .. T.FontFace()
     end
     T.Tooltip(btnFont, T.CvarTip("geminibots_menu_font"))
-    T.SliderRow(form, ru and "Скругление углов (0-16)" or "Corner radius (0-16)",
+    T.SliderRow(form, L{
+        ru = "Скругление углов (0-16)", uk = "Заокруглення кутів (0-16)",
+        es = "Radio de esquinas (0-16)", pt = "Raio dos cantos (0-16)",
+        en = "Corner radius (0-16)" },
         "geminibots_menu_corner", 0, 16, 0)
-    T.SliderRow(form, ru and "Масштаб интерфейса (0.85-1.15)" or "UI scale (0.85-1.15)",
+    T.SliderRow(form, L{
+        ru = "Масштаб интерфейса (0.85-1.15)", uk = "Масштаб інтерфейсу (0.85-1.15)",
+        es = "Escala de la interfaz (0.85-1.15)", pt = "Escala da interface (0.85-1.15)",
+        en = "UI scale (0.85-1.15)" },
         "geminibots_menu_scale", 0.85, 1.15, 2)
 
-    header(ru and "Эффекты" or "Effects")
-    T.SliderRow(form, ru and "Размытие" or "Blur",
+    header(L{
+        ru = "Эффекты", uk = "Ефекти", es = "Efectos",
+        pt = "Efeitos", en = "Effects" })
+    T.SliderRow(form, L{
+        ru = "Размытие", uk = "Розмиття", es = "Desenfoque",
+        pt = "Desfoque", en = "Blur" },
         "geminibots_menu_blur", 0, 3, 0)
-    T.ToggleRow(form, ru and "Анимации открытия/закрытия" or "Open/close animations", "geminibots_menu_fade")
-    T.ToggleRow(form, ru and "Звуки кликов" or "Click sounds", "geminibots_menu_sounds")
+    T.ToggleRow(form, L{
+        ru = "Анимации открытия/закрытия", uk = "Анімації відкриття/закриття",
+        es = "Animaciones de abrir/cerrar", pt = "Animações de abrir/fechar",
+        en = "Open/close animations" }, "geminibots_menu_fade")
+    T.ToggleRow(form, L{
+        ru = "Звуки кликов", uk = "Звуки кліків", es = "Sonidos de clic",
+        pt = "Sons de clique", en = "Click sounds" }, "geminibots_menu_sounds")
 
     -- Режим частиц кнопкой-переключателем: выкл/созвездие/снег/дождь
     local btnParticles = T.AccentButton(form, "")
@@ -388,15 +435,23 @@ function GeminiBots.BuildMenuTabInner(frame, form)
             T.ParticleModes[(idx % #T.ParticleModes) + 1])
     end
     btnParticles.Think = function(self)
-        self.btnLabel = (ru and "Частицы: " or "Particles: ")
+        self.btnLabel = L{
+            ru = "Частицы: ", uk = "Частинки: ", es = "Partículas: ",
+            pt = "Partículas: ", en = "Particles: " }
             .. T.ParticleModeName(T.ParticleMode())
     end
     T.Tooltip(btnParticles, T.CvarTip("geminibots_menu_particles"))
-    T.ToggleRow(form, ru and "Частицы в цвете акцента" or "Accent-colored particles",
+    T.ToggleRow(form, L{
+        ru = "Частицы в цвете акцента", uk = "Частинки в кольорі акценту",
+        es = "Partículas en color de acento", pt = "Partículas na cor de destaque",
+        en = "Accent-colored particles" },
         "geminibots_menu_particles_accent")
 
     GeminiBots.Theme.ButtonGrid(form, {
-        { label = ru and "Сбросить оформление" or "Reset appearance", fn = function()
+        { label = L{
+            ru = "Сбросить оформление", uk = "Скинути оформлення",
+            es = "Restablecer apariencia", pt = "Redefinir aparência",
+            en = "Reset appearance" }, fn = function()
             T.ClickSound()
             T.WriteConVar("geminibots_menu_theme", "dark")
             T.WriteConVar("geminibots_menu_accent", "5865F2")
@@ -411,15 +466,22 @@ function GeminiBots.BuildMenuTabInner(frame, form)
             T.WriteConVar("geminibots_menu_font", "Roboto")
             BuildTab(frame, "menu")
         end },
-        { label = ru and "Сбросить позицию окон" or "Reset window positions", fn = function()
+        { label = L{
+            ru = "Сбросить позицию окон", uk = "Скинути позицію вікон",
+            es = "Restablecer posición de ventanas", pt = "Redefinir posição das janelas",
+            en = "Reset window positions" }, fn = function()
             T.ClickSound()
             file.Delete("geminibots/ui_pos.json")
             BuildTab(frame, "menu")
         end },
     })
 
-    T.MutedLabel(form, ru and "Открытие/закрытие окна: bind p geminibots_menu"
-        or "Toggle window: bind p geminibots_menu")
+    T.MutedLabel(form, L{
+        ru = "Открытие/закрытие окна: bind p geminibots_menu",
+        uk = "Відкриття/закриття вікна: bind p geminibots_menu",
+        es = "Abrir/cerrar ventana: bind p geminibots_menu",
+        pt = "Abrir/fechar janela: bind p geminibots_menu",
+        en = "Toggle window: bind p geminibots_menu" })
 end
 
 local function SwitchTab(frame, id, animate)
@@ -473,7 +535,6 @@ function GeminiBots.OpenSettings()
     end
 
     local T = GeminiBots.Theme
-    local ru = IsRU()
     local frame = vgui.Create("DFrame")
     local W = math.min(ScrW() * 0.95, T.SZ(960))
     local H = math.min(ScrH() * 0.9, T.SZ(680))
@@ -630,16 +691,21 @@ function GeminiBots.OpenSettings()
                 end
             end
         end
-        local title = (GeminiBots.GetMenuLang() == "ru")
-            and "GeminiBots — Настройки ботов" or "GeminiBots — Bot Settings"
+        local title = L{
+            ru = "GeminiBots — Настройки ботов", uk = "GeminiBots — Налаштування ботів",
+            es = "GeminiBots — Ajustes de bots", pt = "GeminiBots — Configurações dos bots",
+            en = "GeminiBots — Bot Settings" }
         T.DrawLogo(T.LogoVariant(), 14, 9, 28, T.Colors.accent)
         T.DrawSpaced(title, "GeminiTitle", 48, 24,
             T.Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1)
         -- Счетчик ботов считаем прямо здесь: Paint идет каждый кадр,
         -- Think для этого ненадежен
-        local ct = (GeminiBots.GetMenuLang() == "ru")
-            and string.format("ботов онлайн: %d/%d", #player.GetBots(), game.MaxPlayers())
-            or string.format("bots online: %d/%d", #player.GetBots(), game.MaxPlayers())
+        local ct = L{
+            ru = string.format("ботов онлайн: %d/%d", #player.GetBots(), game.MaxPlayers()),
+            uk = string.format("ботів онлайн: %d/%d", #player.GetBots(), game.MaxPlayers()),
+            es = string.format("bots en línea: %d/%d", #player.GetBots(), game.MaxPlayers()),
+            pt = string.format("bots online: %d/%d", #player.GetBots(), game.MaxPlayers()),
+            en = string.format("bots online: %d/%d", #player.GetBots(), game.MaxPlayers()) }
         T.DrawSpaced(ct, "GeminiSmall", w - 104, 24,
             T.Colors.muted, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER, 1)
     end
@@ -672,13 +738,13 @@ function GeminiBots.OpenSettings()
         if self.hover > 0.01 then
             draw.RoundedBox(0, 0, 0, w, h, ColorAlpha(T.Colors.accent, self.hover * 80))
         end
-        -- Режим: авто (язык GMod) либо ручной RU/EN
+        -- Режим: авто (язык GMod) либо ручной RU/UK/ES/PT/EN
         local mode = GeminiBots.MenuLangMode and GeminiBots.MenuLangMode() or "auto"
         local txt = mode
         if mode == "auto" then
-            txt = GeminiBots.GetMenuLang() == "ru" and "АВТО" or "AUTO"
+            txt = (GeminiBots.GetMenuLang() == "ru") and "АВТО" or "AUTO"
         else
-            txt = mode == "ru" and "RU" or "EN"
+            txt = string.upper(mode)
         end
         draw.SimpleText(txt,
             "GeminiText", w / 2, h / 2, T.Colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -688,7 +754,7 @@ function GeminiBots.OpenSettings()
         local lang = GeminiBots.ToggleMenuLang()
         for _, nb in pairs(frame.GeminiNav or {}) do
             if IsValid(nb) and nb.titleRU then
-                nb.navLabel = (lang == "ru") and nb.titleRU or nb.titleEN
+                nb.navLabel = nb[lang] or nb.titleEN
             end
         end
         if frame.GeminiCurrent then BuildTab(frame, frame.GeminiCurrent) end
@@ -739,7 +805,7 @@ function GeminiBots.OpenSettings()
         nb.hover = 0
         nb.titleRU = t.ru
         nb.titleEN = t.en
-        nb.navLabel = t[ru and "ru" or "en"]
+        nb.navLabel = t[GeminiBots.GetMenuLang()] or t.en
         local tabId = t.id
         -- Иконка слева (своя векторная, красится в цвет текста)
         local nim = T.IconPanel(nb, t.icon or "cog")

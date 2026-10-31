@@ -249,23 +249,30 @@ hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
 
         -- Статусы: оглушение, огонь, какой звук проверяет
         if showStatus then
-        local langRU = GeminiBots.GetMenuLang and GeminiBots.GetMenuLang() == "ru"
+        local L = GeminiBots.LangStr
         local function textc(s, c)
             draw.SimpleTextOutlined(s, "DermaDefault", tx, ty, c, 0, 0, 1, Color(0, 0, 0, 255))
             ty = ty + 13
         end
         local flags = b.flags or 0
         if bit.band(flags, 1) ~= 0 then
-            textc(string.format(langRU and "ОГЛУШЕН %.1fс" or "BLINDED %.1fs",
+            textc(string.format(L{
+                ru = "ОГЛУШЕН %.1fс", uk = "ОСЛІПЛЕНИЙ %.1fс", es = "CEGADO %.1fs",
+                pt = "CEGADO %.1fs", en = "BLINDED %.1fs" },
                 (b.blind or 0) / 10), Color(255, 220, 80))
         end
         if bit.band(flags, 2) ~= 0 then
-            textc(langRU and "ОГОНЬ — ОТХОД" or "FIRE — BACK", Color(255, 140, 40))
+            textc(L{
+                ru = "ОГОНЬ — ОТХОД", uk = "ВОГОНЬ — ВІДХІД", es = "FUEGO — RETIRADA",
+                pt = "FOGO — RECUAR", en = "FIRE — BACK" }, Color(255, 140, 40))
         end
         if b.state == 4 then
-            local kinds = langRU
-                and { "ищет", "выстрел", "шаги", "декой", "бомба" }
-                or { "searching", "gunfire", "steps", "decoy", "bomb" }
+            local kinds = L{
+                ru = { "ищет", "выстрел", "шаги", "декой", "бомба" },
+                uk = { "шукає", "постріл", "кроки", "декой", "бомба" },
+                es = { "buscando", "disparos", "pasos", "señuelo", "bomba" },
+                pt = { "procurando", "tiros", "passos", "isca", "bomba" },
+                en = { "searching", "gunfire", "steps", "decoy", "bomb" } }
             -- Бомбу показывает отдельная строка, тут не дублируем
             if (b.snd or 0) ~= 4 then
                 textc("→ " .. (kinds[(b.snd or 0) + 1] or kinds[1]), Color(100, 200, 255))
@@ -273,17 +280,29 @@ hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
         end
         -- Статус бомбы: ставлю, убегаю, ищу, дефужу, не хватит времени
         if (b.bomb or 0) > 0 then
-            local words = langRU
-                and { "ставлю", "убегаю", "ищу", "дефужу", "не хватит времени" }
-                or { "planting", "fleeing", "seeking", "defusing", "no time" }
-            textc("БОМБА: " .. (words[b.bomb] or "?"), Color(255, 150, 50))
+            local words = L{
+                ru = { "ставлю", "убегаю", "ищу", "дефужу", "не хватит времени" },
+                uk = { "ставлю", "тікаю", "шукаю", "розміновую", "не вистачить часу" },
+                es = { "plantando", "huyendo", "buscando", "desactivando", "sin tiempo" },
+                pt = { "plantando", "fugindo", "procurando", "desarmando", "sem tempo" },
+                en = { "planting", "fleeing", "seeking", "defusing", "no time" } }
+            local bombWord = L{
+                ru = "БОМБА", uk = "БОМБА", es = "BOMBA",
+                pt = "BOMBA", en = "BOMB" }
+            textc(bombWord .. ": " .. (words[b.bomb] or "?"), Color(255, 150, 50))
         end
         -- Читер: тир из команды спавна
         if (b.cheat or 0) > 0 then
-            local tiers = langRU
-                and { "легит", "аим", "читак", "хвх" }
-                or { "legit", "aim", "cheater", "hvh" }
-            textc("ЧИТЕР: " .. (tiers[b.cheat] or "?"), Color(255, 120, 120))
+            local tiers = L{
+                ru = { "легит", "аим", "читак", "хвх" },
+                uk = { "легіт", "аім", "читер", "хвх" },
+                es = { "legit", "aim", "tramposo", "hvh" },
+                pt = { "legit", "aim", "trapaceiro", "hvh" },
+                en = { "legit", "aim", "cheater", "hvh" } }
+            local cheatWord = L{
+                ru = "ЧИТЕР", uk = "ЧИТЕР", es = "TRAMPOSO",
+                pt = "TRAPACEIRO", en = "CHEATER" }
+            textc(cheatWord .. ": " .. (tiers[b.cheat] or "?"), Color(255, 120, 120))
         end
 
         -- Путь до звука стелим по полу: сегменты между ног бота

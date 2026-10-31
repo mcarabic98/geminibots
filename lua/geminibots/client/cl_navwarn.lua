@@ -10,7 +10,7 @@ GeminiBots.NavWarnShown = GeminiBots.NavWarnShown or {}
 function GeminiBots.ShowNavWarn()
     local T = GeminiBots.Theme
     if not T then return end
-    local ru = GeminiBots.GetMenuLang() == "ru"
+    local L = GeminiBots.LangStr
 
     local f = vgui.Create("DFrame")
     f:SetSize(T.SZ(440), T.SZ(250))
@@ -31,7 +31,9 @@ function GeminiBots.ShowNavWarn()
         local c = T.Corner()
         draw.RoundedBox(c, 0, 0, w, h, T.Colors.bg)
         draw.RoundedBoxEx(c, 0, 0, w, 44, T.Colors.header, true, true, false, false)
-        draw.SimpleText(ru and "Нет навмеша" or "No navmesh",
+        draw.SimpleText(L{
+            ru = "Нет навмеша", uk = "Немає навмешу", es = "Sin navmesh",
+            pt = "Sem navmesh", en = "No navmesh" },
             "GeminiTitle", 14, 22, T.Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
     end
 
@@ -42,11 +44,16 @@ function GeminiBots.ShowNavWarn()
     lbl:SetFont("GeminiText")
     lbl:SetTextColor(T.Colors.text)
     lbl:SetWrap(true)
-    lbl:SetText(ru
-        and "На этой карте нет навмеша — боты не смогут ходить. Сгенерировать пути? Сервер подвиснет на несколько минут."
-        or "This map has no navmesh — bots can't walk. Generate paths? The server will freeze for a few minutes.")
+    lbl:SetText(L{
+        ru = "На этой карте нет навмеша — боты не смогут ходить. Сгенерировать пути? Сервер подвиснет на несколько минут.",
+        uk = "На цій карті немає навмешу — боти не зможуть ходити. Згенрувати шляхи? Сервер підвисне на кілька хвилин.",
+        es = "Este mapa no tiene navmesh — los bots no pueden caminar. ¿Generar rutas? El servidor se congelará unos minutos.",
+        pt = "Este mapa não tem navmesh — os bots não conseguem andar. Gerar caminhos? O servidor vai travar por alguns minutos.",
+        en = "This map has no navmesh — bots can't walk. Generate paths? The server will freeze for a few minutes." })
 
-    local btnGen = T.AccentButton(f, ru and "Сгенерировать пути" or "Generate paths")
+    local btnGen = T.AccentButton(f, GeminiBots.LangStr{
+        ru = "Сгенерировать пути", uk = "Згенрувати шляхи", es = "Generar rutas",
+        pt = "Gerar caminhos", en = "Generate paths" })
     btnGen:DockMargin(T.SZ(14), T.SZ(2), T.SZ(14), T.SZ(10))
     btnGen.DoClick = function()
         T.ClickSound()
@@ -62,7 +69,9 @@ function GeminiBots.ShowNavWarn()
     btnNo:SetTall(T.SZ(32))
     btnNo:SetText("")
     btnNo.hover = 0
-    btnNo.btnLabel = ru and "Ничего не делать" or "Do nothing"
+    btnNo.btnLabel = GeminiBots.LangStr{
+        ru = "Ничего не делать", uk = "Нічого не робити", es = "No hacer nada",
+        pt = "Não fazer nada", en = "Do nothing" }
     function btnNo:Paint(w, h)
         self.hover = Lerp(FrameTime() * 12, self.hover or 0, self:IsHovered() and 1 or 0)
         local bgc = T.Colors.row

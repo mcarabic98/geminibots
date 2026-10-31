@@ -70,7 +70,7 @@ CreateClientConVar("geminibots_menu_particles", "stars", true, false,
 CreateClientConVar("geminibots_menu_particles_accent", "1", true, false,
     "Частицы в цвете акцента меню (1 = Вкл, 0 = белые)")
 CreateClientConVar("geminibots_menu_lang", "auto", true, false,
-    "Язык меню GeminiBots: auto/ru/en (auto = как в GMod)")
+    "Язык меню GeminiBots: auto/ru/uk/es/pt-br/en (auto = как в GMod)")
 CreateClientConVar("geminibots_menu_logo", "0", true, false,
     "Лого GeminiBots в шапке: 0 голова-бот / 1 радар-свип / 2 вейпоинт-ромб")
 
@@ -85,7 +85,7 @@ GeminiBots.ConVarDescs["geminibots_menu_scale"] = "Масштаб интерфе
 GeminiBots.ConVarDescs["geminibots_menu_sounds"] = "Звуки кликов в меню GeminiBots (вкл/выкл)"
 GeminiBots.ConVarDescs["geminibots_menu_particles"] = "Частицы на фоне меню GeminiBots: выкл/созвездие/снег/дождь/искры"
 GeminiBots.ConVarDescs["geminibots_menu_particles_accent"] = "Частицы в цвете акцента (выкл = белые)"
-GeminiBots.ConVarDescs["geminibots_menu_lang"] = "Язык меню: авто (как в GMod) / русский / английский"
+GeminiBots.ConVarDescs["geminibots_menu_lang"] = "Язык меню: авто (как в GMod) / русский / українська / español / português / english"
 GeminiBots.ConVarDescs["geminibots_menu_logo"] = "Лого в шапке меню: голова-бот / радар-свип / вейпоинт-ромб"
 GeminiBots.ConVarDescs["geminibots_menu_font"] = "Шрифт меню GeminiBots (Roboto и похожие)"
 
@@ -330,10 +330,13 @@ function T.ParticleMode()
 end
 
 function T.ParticleModeName(mode)
-    local ru = GeminiBots.GetMenuLang() == "ru"
-    local names = ru
-        and { off = "Выкл", stars = "Созвездие", snow = "Снег", rain = "Дождь", embers = "Искры" }
-        or { off = "Off", stars = "Stars", snow = "Snow", rain = "Rain", embers = "Embers" }
+    local names = GeminiBots.LangStr{
+        ru = { off = "Выкл", stars = "Созвездие", snow = "Снег", rain = "Дождь", embers = "Искры" },
+        uk = { off = "Викл", stars = "Зорі", snow = "Сніг", rain = "Дощ", embers = "Іскри" },
+        es = { off = "No", stars = "Estrellas", snow = "Nieve", rain = "Lluvia", embers = "Chispas" },
+        pt = { off = "Desligado", stars = "Estrelas", snow = "Neve", rain = "Chuva", embers = "Faíscas" },
+        en = { off = "Off", stars = "Stars", snow = "Snow", rain = "Rain", embers = "Embers" },
+    }
     return names[mode] or mode
 end
 
@@ -574,15 +577,206 @@ GeminiBots.ConVarDescsEN = {
     ["geminibots_menu_sounds"] = "Click sounds in GeminiBots menu (on/off)",
     ["geminibots_menu_particles"] = "Menu background particles: off/stars/snow/rain/embers",
     ["geminibots_menu_particles_accent"] = "Particles in accent color (off = white)",
-    ["geminibots_menu_lang"] = "Menu language: auto (same as GMod) / Russian / English",
+    ["geminibots_menu_lang"] = "Menu language: auto (same as GMod) / Russian / Ukrainian / Spanish / Brazilian Portuguese / English",
     ["geminibots_menu_font"] = "GeminiBots menu font (Roboto and lookalikes)",
+}
+
+-- Украинские описания для тултипов
+GeminiBots.ConVarDescsUK = {
+    ["geminibots_enabled"] = "Увімкнути ІІ ботів GeminiBots (вкл/викл)",
+    ["geminibots_custom_names"] = "Унікальні кастомні ніки ботів (вкл/викл)",
+    ["geminibots_preserve_bots"] = "Відновлювати ботів при зміні карти (вкл/викл)",
+    ["geminibots_debug"] = "Вивід налагодження ботів у консоль (вкл/викл)",
+    ["geminibots_debug_draw"] = "Візуалізація налагодження у світі: траєкторії та шляхи (вкл/викл)",
+    ["geminibots_appearance_enabled"] = "Випадкова зовнішність ботів при спавні (вкл/викл)",
+    ["geminibots_appearance_model"] = "Випадкові моделі гравців (вкл/викл)",
+    ["geminibots_appearance_skin"] = "Випадкові скіни моделей (вкл/викл)",
+    ["geminibots_appearance_bodygroups"] = "Випадкові бодігрупи (вкл/викл)",
+    ["geminibots_appearance_color"] = "Випадковий колір гравця (вкл/викл)",
+    ["geminibots_appearance_respawn"] = "Змінювати зовнішність при кожному відродженні (вкл/викл)",
+    ["geminibots_loadout_enabled"] = "Випадкова видача зброї при спавні (вкл/викл)",
+    ["geminibots_loadout_min"] = "Мін. кількість стволів (1-5)",
+    ["geminibots_loadout_max"] = "Макс. кількість стволів (1-5)",
+    ["geminibots_loadout_ammo"] = "Запасні набої на кожну зброю",
+    ["geminibots_loadout_strip"] = "Очищати дефолтну зброю перед видачею (вкл/викл)",
+    ["geminibots_chat_enabled"] = "Дозволити ботам писати в чат (вкл/викл)",
+    ["geminibots_chat_smart_context"] = "Розумний контекст фраз з K/D і стріками (вкл/викл)",
+    ["geminibots_chat_kill_chance"] = "Шанс повідомлення в чат після фрага (0-100%)",
+    ["geminibots_chat_death_chance"] = "Шанс повідомлення після власної смерті (0-100%)",
+    ["geminibots_chat_comeback_chance"] = "Шанс відповіді бота на звинувачення (0-100%)",
+    ["geminibots_chat_taunt_chance"] = "Шанс бойової насмішки (0-100%)",
+    ["geminibots_file_log"] = "Докладний лог у файл data/geminibots/logs/debug.log (вкл/викл)",
+    ["geminibots_vision_fov"] = "Кут огляду ботів у градусах (30-180)",
+    ["geminibots_vision_range"] = "Макс. дальність виявлення ворогів (юніти)",
+    ["geminibots_hearing_range"] = "Дальність слуху кроків крізь стіни (юніти)",
+    ["geminibots_gun_hearing_range"] = "Дальність слуху пострілів (юніти)",
+    ["geminibots_memory_duration"] = "Скільки секунд бот пам'ятає ціль за укриттям",
+    ["geminibots_target_mode"] = "Режим цілей: both / pve / players / npcs",
+    ["geminibots_reaction_min"] = "Мін. затримка реакції перед вогнем (сек)",
+    ["geminibots_reaction_max"] = "Макс. затримка реакції перед вогнем (сек)",
+    ["geminibots_aim_speed"] = "Швидкість доводки прицілу (градусів/сек)",
+    ["geminibots_aim_smoothing"] = "Плавність наведення (0.05-1.0)",
+    ["geminibots_aim_prediction"] = "Випередження руху цілі при стрільбі (вкл/викл)",
+    ["geminibots_aim_spread"] = "Розкид/помилка прицілювання в градусах (0.0-5.0)",
+    ["geminibots_aim_headshot_chance"] = "Ймовірність целитися в голову (0-100%)",
+    ["geminibots_combat_min_dist"] = "Мін. дистанція бою перед відходом (юніти)",
+    ["geminibots_combat_max_dist"] = "Макс. дистанція бою перед зближенням (юніти)",
+    ["geminibots_flee_health"] = "Поріг здоров'я для втечі (0.0-0.8)",
+    ["geminibots_wallbang"] = "Простріл скла/крихкого по свіжому сліду (вкл/викл)",
+    ["geminibots_c4_enabled"] = "Боти ставлять і розміновують C4 зі SWCS (вкл/викл)",
+    ["geminibots_swcs_decoy_chance"] = "Шанс піти перевіряти звук декоя SWCS (0-100%)",
+    ["geminibots_swcs_fire_avoid"] = "Відходити від вогню молотова SWCS (вкл/викл)",
+    ["geminibots_swcs_fire_radius"] = "Дистанція реакції на вогонь SWCS (юніти)",
+    ["geminibots_bhop_enabled"] = "Банніхоп ботів на ходу (вкл/викл)",
+    ["geminibots_bhop_chance"] = "Шанс стрибка на кожне приземлення (0-100%)",
+    ["geminibots_menu_theme"] = "Тема меню GeminiBots: dark / light",
+    ["geminibots_menu_fade"] = "Анімації відкриття/закриття вікон GeminiBots (вкл/викл)",
+    ["geminibots_menu_blur"] = "Розмиття фону під вікнами GeminiBots: рівень 0-3 (0 = Викл)",
+    ["geminibots_menu_accent"] = "Акцентний колір меню GeminiBots (hex без #, напр. 5865F2)",
+    ["geminibots_menu_corner"] = "Радіус заокруглення меню GeminiBots (0-16)",
+    ["geminibots_menu_scale"] = "Масштаб інтерфейсу меню GeminiBots (85-115%)",
+    ["geminibots_menu_sounds"] = "Звуки кліків у меню GeminiBots (вкл/викл)",
+    ["geminibots_menu_particles"] = "Частинки на фоні меню GeminiBots: вимкнено/зорі/сніг/дощ/іскри",
+    ["geminibots_menu_particles_accent"] = "Частинки в кольорі акценту (викл = білі)",
+    ["geminibots_menu_lang"] = "Мова меню: авто (як у GMod) / русский / українська / español / português / english",
+    ["geminibots_menu_font"] = "Шрифт меню GeminiBots (Roboto та схожі)",
+}
+
+-- Испанские описания для тултипов
+GeminiBots.ConVarDescsES = {
+    ["geminibots_enabled"] = "Activar la IA de los bots GeminiBots (sí/no)",
+    ["geminibots_custom_names"] = "Apodos personalizados únicos para bots (sí/no)",
+    ["geminibots_preserve_bots"] = "Restaurar bots al cambiar de mapa (sí/no)",
+    ["geminibots_debug"] = "Salida de depuración de bots en consola (sí/no)",
+    ["geminibots_debug_draw"] = "Dibujo de depuración en el mundo: trayectorias y rutas (sí/no)",
+    ["geminibots_appearance_enabled"] = "Apariencia aleatoria de bots al aparecer (sí/no)",
+    ["geminibots_appearance_model"] = "Modelos de jugador aleatorios (sí/no)",
+    ["geminibots_appearance_skin"] = "Skins de modelo aleatorios (sí/no)",
+    ["geminibots_appearance_bodygroups"] = "Bodygroups aleatorios (sí/no)",
+    ["geminibots_appearance_color"] = "Color de jugador aleatorio (sí/no)",
+    ["geminibots_appearance_respawn"] = "Cambiar apariencia en cada reaparición (sí/no)",
+    ["geminibots_loadout_enabled"] = "Armas aleatorias al aparecer (sí/no)",
+    ["geminibots_loadout_min"] = "Nº mínimo de armas (1-5)",
+    ["geminibots_loadout_max"] = "Nº máximo de armas (1-5)",
+    ["geminibots_loadout_ammo"] = "Munición de reserva por arma",
+    ["geminibots_loadout_strip"] = "Quitar armas predeterminadas antes de repartir (sí/no)",
+    ["geminibots_chat_enabled"] = "Dejar que los bots escriban en el chat (sí/no)",
+    ["geminibots_chat_smart_context"] = "Contexto inteligente de frases con K/D y rachas (sí/no)",
+    ["geminibots_chat_kill_chance"] = "Probabilidad de mensaje tras una baja (0-100%)",
+    ["geminibots_chat_death_chance"] = "Probabilidad de mensaje tras morir (0-100%)",
+    ["geminibots_chat_comeback_chance"] = "Probabilidad de respuesta del bot a una acusación (0-100%)",
+    ["geminibots_chat_taunt_chance"] = "Probabilidad de provocación en combate (0-100%)",
+    ["geminibots_file_log"] = "Registro detallado en data/geminibots/logs/debug.log (sí/no)",
+    ["geminibots_vision_fov"] = "Campo de visión de los bots en grados (30-180)",
+    ["geminibots_vision_range"] = "Distancia máxima de detección de enemigos (unidades)",
+    ["geminibots_hearing_range"] = "Alcance auditivo de pasos a través de muros (unidades)",
+    ["geminibots_gun_hearing_range"] = "Alcance auditivo de disparos (unidades)",
+    ["geminibots_memory_duration"] = "Cuánto tiempo recuerda el bot un objetivo tras una cobertura",
+    ["geminibots_target_mode"] = "Modo de objetivos: both / pve / players / npcs",
+    ["geminibots_reaction_min"] = "Retardo mínimo de reacción antes de disparar (seg)",
+    ["geminibots_reaction_max"] = "Retardo máximo de reacción antes de disparar (seg)",
+    ["geminibots_aim_speed"] = "Velocidad de giro de la mira (grados/seg)",
+    ["geminibots_aim_smoothing"] = "Suavizado del apuntado (0.05-1.0)",
+    ["geminibots_aim_prediction"] = "Anticipar el movimiento del objetivo al disparar (sí/no)",
+    ["geminibots_aim_spread"] = "Dispersión/error de puntería en grados (0.0-5.0)",
+    ["geminibots_aim_headshot_chance"] = "Probabilidad de apuntar a la cabeza (0-100%)",
+    ["geminibots_combat_min_dist"] = "Distancia mínima de combate antes de retroceder (unidades)",
+    ["geminibots_combat_max_dist"] = "Distancia máxima de combate antes de acercarse (unidades)",
+    ["geminibots_flee_health"] = "Umbral de vida para huir (0.0-0.8)",
+    ["geminibots_wallbang"] = "Disparar a través de cristal/frágil con rastro fresco (sí/no)",
+    ["geminibots_c4_enabled"] = "Los bots colocan y desactivan C4 de SWCS (sí/no)",
+    ["geminibots_swcs_decoy_chance"] = "Probabilidad de investigar un señuelo SWCS (0-100%)",
+    ["geminibots_swcs_fire_avoid"] = "Apartarse del fuego de molotov de SWCS (sí/no)",
+    ["geminibots_swcs_fire_radius"] = "Distancia de reacción al fuego SWCS (unidades)",
+    ["geminibots_bhop_enabled"] = "Bunny-hop de los bots al moverse (sí/no)",
+    ["geminibots_bhop_chance"] = "Probabilidad de salto en cada aterrizaje (0-100%)",
+    ["geminibots_menu_theme"] = "Tema del menú GeminiBots: dark / light",
+    ["geminibots_menu_fade"] = "Animaciones de abrir/cerrar ventanas GeminiBots (sí/no)",
+    ["geminibots_menu_blur"] = "Desenfoque de fondo bajo ventanas GeminiBots: nivel 0-3 (0 = No)",
+    ["geminibots_menu_accent"] = "Color de acento del menú GeminiBots (hex sin #, p. ej. 5865F2)",
+    ["geminibots_menu_corner"] = "Radio de esquinas del menú GeminiBots (0-16)",
+    ["geminibots_menu_scale"] = "Escala de la interfaz del menú GeminiBots (85-115%)",
+    ["geminibots_menu_sounds"] = "Sonidos de clic en el menú GeminiBots (sí/no)",
+    ["geminibots_menu_particles"] = "Partículas de fondo del menú GeminiBots: off/estrellas/nieve/lluvia/chispas",
+    ["geminibots_menu_particles_accent"] = "Partículas en color de acento (no = blancas)",
+    ["geminibots_menu_lang"] = "Idioma del menú: auto (como GMod) / русский / українська / español / português / english",
+    ["geminibots_menu_font"] = "Fuente del menú GeminiBots (Roboto y similares)",
+}
+
+-- Бразильские описания для тултипов (португальский)
+GeminiBots.ConVarDescsPT = {
+    ["geminibots_enabled"] = "Ativar a IA dos bots GeminiBots (liga/desliga)",
+    ["geminibots_custom_names"] = "Apelidos personalizados únicos para bots (liga/desliga)",
+    ["geminibots_preserve_bots"] = "Restaurar bots ao trocar de mapa (liga/desliga)",
+    ["geminibots_debug"] = "Saída de depuração dos bots no console (liga/desliga)",
+    ["geminibots_debug_draw"] = "Desenho de depuração no mundo: trajetórias e caminhos (liga/desliga)",
+    ["geminibots_appearance_enabled"] = "Aparência aleatória dos bots ao nascer (liga/desliga)",
+    ["geminibots_appearance_model"] = "Modelos de jogador aleatórios (liga/desliga)",
+    ["geminibots_appearance_skin"] = "Skins de modelo aleatórias (liga/desliga)",
+    ["geminibots_appearance_bodygroups"] = "Bodygroups aleatórios (liga/desliga)",
+    ["geminibots_appearance_color"] = "Cor de jogador aleatória (liga/desliga)",
+    ["geminibots_appearance_respawn"] = "Mudar aparência a cada renascimento (liga/desliga)",
+    ["geminibots_loadout_enabled"] = "Armas aleatórias ao nascer (liga/desliga)",
+    ["geminibots_loadout_min"] = "Nº mínimo de armas (1-5)",
+    ["geminibots_loadout_max"] = "Nº máximo de armas (1-5)",
+    ["geminibots_loadout_ammo"] = "Munição de reserva por arma",
+    ["geminibots_loadout_strip"] = "Remover armas padrão antes de distribuir (liga/desliga)",
+    ["geminibots_chat_enabled"] = "Deixar os bots escreverem no chat (liga/desliga)",
+    ["geminibots_chat_smart_context"] = "Contexto inteligente de frases com K/D e sequências (liga/desliga)",
+    ["geminibots_chat_kill_chance"] = "Chance de mensagem no chat após eliminação (0-100%)",
+    ["geminibots_chat_death_chance"] = "Chance de mensagem após a própria morte (0-100%)",
+    ["geminibots_chat_comeback_chance"] = "Chance de resposta do bot a uma acusação (0-100%)",
+    ["geminibots_chat_taunt_chance"] = "Chance de provocação em combate (0-100%)",
+    ["geminibots_file_log"] = "Log detalhado em data/geminibots/logs/debug.log (liga/desliga)",
+    ["geminibots_vision_fov"] = "Campo de visão dos bots em graus (30-180)",
+    ["geminibots_vision_range"] = "Distância máxima de detecção de inimigos (unidades)",
+    ["geminibots_hearing_range"] = "Alcance auditivo de passos através de paredes (unidades)",
+    ["geminibots_gun_hearing_range"] = "Alcance auditivo de tiros (unidades)",
+    ["geminibots_memory_duration"] = "Por quanto tempo o bot lembra de um alvo atrás de cobertura",
+    ["geminibots_target_mode"] = "Modo de alvos: both / pve / players / npcs",
+    ["geminibots_reaction_min"] = "Atraso mínimo de reação antes de atirar (seg)",
+    ["geminibots_reaction_max"] = "Atraso máximo de reação antes de atirar (seg)",
+    ["geminibots_aim_speed"] = "Velocidade de giro da mira (graus/seg)",
+    ["geminibots_aim_smoothing"] = "Suavização da mira (0.05-1.0)",
+    ["geminibots_aim_prediction"] = "Antecipar o movimento do alvo ao atirar (liga/desliga)",
+    ["geminibots_aim_spread"] = "Dispersão/erro de mira em graus (0.0-5.0)",
+    ["geminibots_aim_headshot_chance"] = "Chance de mirar na cabeça (0-100%)",
+    ["geminibots_combat_min_dist"] = "Distância mínima de combate antes de recuar (unidades)",
+    ["geminibots_combat_max_dist"] = "Distância máxima de combate antes de aproximar (unidades)",
+    ["geminibots_flee_health"] = "Limiar de vida para fugir (0.0-0.8)",
+    ["geminibots_wallbang"] = "Atirar através de vidro/frágil com rastro fresco (liga/desliga)",
+    ["geminibots_c4_enabled"] = "Bots plantam e desarmam C4 do SWCS (liga/desliga)",
+    ["geminibots_swcs_decoy_chance"] = "Chance de investigar uma isca do SWCS (0-100%)",
+    ["geminibots_swcs_fire_avoid"] = "Afastar-se do fogo de molotov do SWCS (liga/desliga)",
+    ["geminibots_swcs_fire_radius"] = "Distância de reação ao fogo do SWCS (unidades)",
+    ["geminibots_bhop_enabled"] = "Bunny-hop dos bots ao andar (liga/desliga)",
+    ["geminibots_bhop_chance"] = "Chance de pulo a cada aterrissagem (0-100%)",
+    ["geminibots_menu_theme"] = "Tema do menu GeminiBots: dark / light",
+    ["geminibots_menu_fade"] = "Animações de abrir/fechar janelas GeminiBots (liga/desliga)",
+    ["geminibots_menu_blur"] = "Desfoque de fundo sob janelas GeminiBots: nível 0-3 (0 = Desligado)",
+    ["geminibots_menu_accent"] = "Cor de destaque do menu GeminiBots (hex sem #, ex.: 5865F2)",
+    ["geminibots_menu_corner"] = "Raio dos cantos do menu GeminiBots (0-16)",
+    ["geminibots_menu_scale"] = "Escala da interface do menu GeminiBots (85-115%)",
+    ["geminibots_menu_sounds"] = "Sons de clique no menu GeminiBots (liga/desliga)",
+    ["geminibots_menu_particles"] = "Partículas de fundo do menu GeminiBots: off/estrelas/neve/chuva/faíscas",
+    ["geminibots_menu_particles_accent"] = "Partículas na cor de destaque (desligado = brancas)",
+    ["geminibots_menu_lang"] = "Idioma do menu: auto (como o GMod) / русский / українська / español / português / english",
+    ["geminibots_menu_font"] = "Fonte do menu GeminiBots (Roboto e similares)",
 }
 
 -- Текст тултипа на языке меню + скобки из подписи
 function T.CvarTip(convarName, extra)
-    local ru = GeminiBots.GetMenuLang() == "ru"
-    local d = ru and GeminiBots.ConVarDescs or GeminiBots.ConVarDescsEN
+    local lang = GeminiBots.GetMenuLang()
+    local byLang = {
+        ru = GeminiBots.ConVarDescs,
+        uk = GeminiBots.ConVarDescsUK,
+        es = GeminiBots.ConVarDescsES,
+        pt = GeminiBots.ConVarDescsPT,
+        en = GeminiBots.ConVarDescsEN,
+    }
+    local d = byLang[lang] or GeminiBots.ConVarDescsEN
     local tip = (d and d[convarName])
+        or (GeminiBots.ConVarDescsEN and GeminiBots.ConVarDescsEN[convarName])
         or (GeminiBots.ConVarDescs and GeminiBots.ConVarDescs[convarName]) or ""
     if extra and extra ~= "" then tip = tip .. "\n" .. extra end
     return tip
@@ -1128,7 +1322,6 @@ function T.AskText(title, initial, isNumeric, onLive, onConfirm, onCancel)
     -- структурно, а не проверками (проверки гонки не держат)
     local f = IsValid(GeminiBots.AskFrame) and GeminiBots.AskFrame or nil
     if not f then
-        local ru0 = GeminiBots.GetMenuLang() == "ru"
         f = vgui.Create("DFrame")
         GeminiBots.AskFrame = f
         f:SetSize(T.SZ(400), T.SZ(150))
@@ -1177,7 +1370,9 @@ function T.AskText(title, initial, isNumeric, onLive, onConfirm, onCancel)
         bOk:SetPos(10, by)
         bOk:SetSize(bw, T.SZ(30))
         f.GeminiOk = bOk
-        local bNo = T.AccentButton(f, ru0 and "Отмена" or "Cancel")
+        local bNo = T.AccentButton(f, GeminiBots.LangStr{
+            ru = "Отмена", uk = "Скасувати", es = "Cancelar",
+            pt = "Cancelar", en = "Cancel" })
         bNo:Dock(NODOCK)
         bNo:SetPos(10 + bw + 8, by)
         bNo:SetSize(FW - 20 - bw - 8, T.SZ(30))
@@ -1192,7 +1387,6 @@ function T.AskText(title, initial, isNumeric, onLive, onConfirm, onCancel)
     -- Новое открытие: поколение +1, старые колбэки протухают
     f.GeminiGen = (f.GeminiGen or 0) + 1
     local myGen = f.GeminiGen
-    local ru = GeminiBots.GetMenuLang() == "ru"
     f.GeminiTitle = title or ""
     f.GeminiDone = false
     local entry = f.GeminiEntry
@@ -1220,7 +1414,10 @@ function T.AskText(title, initial, isNumeric, onLive, onConfirm, onCancel)
         if onLive then onLive(self:GetValue()) end
     end
     f.GeminiOk.DoClick = function() finish(true, entry:GetValue()) end
-    f.GeminiNo.btnLabel = ru and "Отмена" or "Cancel"
+    local cancelLabel = GeminiBots.LangStr{
+        ru = "Отмена", uk = "Скасувати", es = "Cancelar",
+        pt = "Cancelar", en = "Cancel" }
+    f.GeminiNo.btnLabel = cancelLabel
     f.GeminiNo.DoClick = function() finish(false) end
     gui.EnableScreenClicker(false)
     f:MakePopup()
