@@ -751,17 +751,9 @@ function GeminiBots.OpenSettings()
     end
     langBtn.DoClick = function()
         T.ClickSound()
-        local lang = GeminiBots.ToggleMenuLang()
-        for _, nb in pairs(frame.GeminiNav or {}) do
-            if IsValid(nb) and nb.titleRU then
-                nb.navLabel = nb[lang] or nb.titleEN
-            end
-        end
-        if frame.GeminiCurrent then BuildTab(frame, frame.GeminiCurrent) end
-        -- Арсенал живет отдельно: обновляем его подписи тоже
-        if IsValid(GeminiBots.ArsenalFrame) and GeminiBots.ArsenalFrame.ApplyLang then
-            GeminiBots.ArsenalFrame:ApplyLang()
-        end
+        -- Пересборку (сайдбар, вкладка, арсенал) делает колбэк смены
+        -- geminibots_menu_lang: он срабатывает уже после применения конвара
+        GeminiBots.ToggleMenuLang()
     end
 
     -- Сайдбар навигации
@@ -793,6 +785,9 @@ function GeminiBots.OpenSettings()
         local form = vgui.Create("DPanel", scroll)
         form:Dock(TOP)
         form.Paint = function() end
+        -- Метка для колбэка смены языка в cl_qmenu: эти панели он не трогает,
+        -- их пересобирает свой колбэк (BuildTab + FitForm + подписи сайдбара)
+        form.GeminiIsStandalone = true
         ShimForm(form)
         frame.GeminiForms[t.id] = { form = form, scroll = scroll }
 
@@ -891,6 +886,27 @@ function GeminiBots.RefreshOpenWindows()
         GeminiBots.ArsenalFrame:RefreshList()
     end
 end
+
+-- Смена языка меню: пересобираем открытые окна ПОСЛЕ применения конвара.
+-- Раньше пересборка была только в кнопке языка, поэтому при смене языка
+-- из консоли или Q-меню (а также при отложенном применении RunConsoleCommand)
+-- окно оставалось на старом языке: заголовок уже новый, контент — старый
+cvars.AddChangeCallback("geminibots_menu_lang", function()
+    local fr = GeminiBots.SettingsFrame
+    if IsValid(fr) then
+        local lang = GeminiBots.GetMenuLang()
+        for _, nb in pairs(fr.GeminiNav or {}) do
+            if IsValid(nb) and nb.titleRU then
+                nb.navLabel = nb[lang] or nb.titleEN
+            end
+        end
+        if fr.GeminiCurrent then BuildTab(fr, fr.GeminiCurrent) end
+    end
+    local ar = GeminiBots.ArsenalFrame
+    if IsValid(ar) and ar.ApplyLang then
+        ar:ApplyLang()
+    end
+end, "GeminiBots_LangChanged")
 
 concommand.Add("geminibots_menu", function()
     -- Тоггл на бинд: открыто — закрыть, закрыто — открыть

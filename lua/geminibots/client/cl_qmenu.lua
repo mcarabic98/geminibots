@@ -718,9 +718,6 @@ local PHRASES = {
     }
 }
 
--- Текущий язык клиента: ручной выбор либо вживую из GMod
-local currentLang = "ru"
-
 -- Доступные языки меню (коды). "pt-br" из конвара нормализуется в "pt"
 GeminiBots.MENU_LANGS = { "ru", "uk", "es", "pt", "en" }
 
@@ -754,8 +751,7 @@ local function BuildSettingsMenu(panel, tab, opts)
         local btnLang = panel:Button(T("LangButton"))
         btnLang.DoClick = function()
             GeminiBots.ToggleMenuLang()
-            currentLang = GeminiBots.GetMenuLang()
-            BuildSettingsMenu(panel, tab)
+            -- Пересборку панели делает колбэк смены geminibots_menu_lang
         end
 
         panel:Help(T("MenuDesc"))
@@ -1203,6 +1199,21 @@ function GeminiBots.ToggleMenuLang()
         if m == cur then nextLang = order[(i % #order) + 1] break end
     end
     RunConsoleCommand("geminibots_menu_lang", nextLang)
-    currentLang = GeminiBots.GetMenuLang()
-    return currentLang
+    -- Возвращаем вычисленное значение: RunConsoleCommand может применить
+    -- конвар отложенно, чтение назад вернуло бы еще старый язык
+    if nextLang == "auto" then
+        return (GeminiBots.MenuLangMode() == "auto") and "auto" or GeminiBots.GetMenuLang()
+    end
+    return nextLang
 end
+
+-- Смена языка из консоли/Q-меню: пересобираем текущую панель построителя,
+-- если это панель спавнменю (панели отдельного окна обслуживает колбэк
+-- GeminiBots_LangChanged в cl_settings.lua). Колбэк срабатывает ПОСЛЕ
+-- применения конвара, поэтому T() читает уже новый язык
+cvars.AddChangeCallback("geminibots_menu_lang", function()
+    if IsValid(currentSettingsPanel)
+        and not (currentSettingsPanel.GeminiIsMenuTab or currentSettingsPanel.GeminiIsStandalone) then
+        BuildSettingsMenu(currentSettingsPanel, currentTab, currentOpts)
+    end
+end, "GeminiBots_LangChanged_QMenu")
