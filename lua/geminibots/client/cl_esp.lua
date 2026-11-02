@@ -168,6 +168,62 @@ local function DrawSkeleton(ent)
     end
 end
 
+-- Цвета и строки статусов: HUDPaint гоняет их каждый кадр на каждого бота,
+-- поэтому аллоцируем один раз (строки — лениво на язык), а не в цикле рисования
+local COLOR_OUTLINE = Color(0, 0, 0, 255)
+local ESPColors = {
+    blind = Color(255, 220, 80),
+    fire = Color(255, 140, 40),
+    sound = Color(100, 200, 255),
+    bomb = Color(255, 150, 50),
+    cheat = Color(255, 120, 120),
+    teamRebel = Color(255, 130, 60),
+    teamCombine = Color(130, 140, 255),
+}
+local ESPStrings = nil
+local ESPStringsLang = nil
+
+local function GetESPStrings()
+    local lang = GeminiBots.GetMenuLang()
+    if ESPStringsLang ~= lang or not ESPStrings then
+        local L = GeminiBots.LangStr
+        ESPStringsLang = lang
+        ESPStrings = {
+            blind = L{
+                ru = "ОГЛУШЕН %.1fс", uk = "ОСЛІПЛЕНИЙ %.1fс", es = "CEGADO %.1fs",
+                pt = "CEGADO %.1fs", en = "BLINDED %.1fs" },
+            fire = L{
+                ru = "ОГОНЬ — ОТХОД", uk = "ВОГОНЬ — ВІДХІД", es = "FUEGO — RETIRADA",
+                pt = "FOGO — RECUAR", en = "FIRE — BACK" },
+            kinds = L{
+                ru = { "ищет", "выстрел", "шаги", "декой", "бомба" },
+                uk = { "шукає", "постріл", "кроки", "декой", "бомба" },
+                es = { "buscando", "disparos", "pasos", "señuelo", "bomba" },
+                pt = { "procurando", "tiros", "passos", "isca", "bomba" },
+                en = { "searching", "gunfire", "steps", "decoy", "bomb" } },
+            bombWord = L{
+                ru = "БОМБА", uk = "БОМБА", es = "BOMBA",
+                pt = "BOMBA", en = "BOMB" },
+            bomb = L{
+                ru = { "ставлю", "убегаю", "ищу", "дефужу", "не хватит времени" },
+                uk = { "ставлю", "тікаю", "шукаю", "розміновую", "не вистачить часу" },
+                es = { "plantando", "huyendo", "buscando", "desactivando", "sin tiempo" },
+                pt = { "plantando", "fugindo", "procurando", "desarmando", "sem tempo" },
+                en = { "planting", "fleeing", "seeking", "defusing", "no time" } },
+            cheatWord = L{
+                ru = "ЧИТЕР", uk = "ЧИТЕР", es = "TRAMPOSO",
+                pt = "TRAPACEIRO", en = "CHEATER" },
+            cheat = L{
+                ru = { "легит", "аим", "читак", "хвх" },
+                uk = { "легіт", "аім", "читер", "хвх" },
+                es = { "legit", "aim", "tramposo", "hvh" },
+                pt = { "legit", "aim", "trapaceiro", "hvh" },
+                en = { "legit", "aim", "cheater", "hvh" } },
+        }
+    end
+    return ESPStrings
+end
+
 hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
     local cache = GeminiBots.ESPCache
     if not cache or CurTime() > cache.expire then return end
@@ -227,7 +283,7 @@ hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
         local tx = x + w + 5
         local ty = y
         local function text(s)
-            draw.SimpleTextOutlined(s, "DermaDefault", tx, ty, col, 0, 0, 1, Color(0, 0, 0, 255))
+            draw.SimpleTextOutlined(s, "DermaDefault", tx, ty, col, 0, 0, 1, COLOR_OUTLINE)
             ty = ty + 13
         end
         if showInfo then
@@ -238,71 +294,42 @@ hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
             -- Команда детматча (только HL2MP присылает ненулевую)
             if (b.team or 0) == 1 then
                 draw.SimpleTextOutlined("REBEL", "DermaDefault", tx, ty,
-                    Color(255, 130, 60), 0, 0, 1, Color(0, 0, 0, 255))
+                    ESPColors.teamRebel, 0, 0, 1, COLOR_OUTLINE)
                 ty = ty + 13
             elseif (b.team or 0) == 2 then
                 draw.SimpleTextOutlined("COMBINE", "DermaDefault", tx, ty,
-                    Color(130, 140, 255), 0, 0, 1, Color(0, 0, 0, 255))
+                    ESPColors.teamCombine, 0, 0, 1, COLOR_OUTLINE)
                 ty = ty + 13
             end
         end
 
         -- Статусы: оглушение, огонь, какой звук проверяет
         if showStatus then
-        local L = GeminiBots.LangStr
+        local st = GetESPStrings()
         local function textc(s, c)
-            draw.SimpleTextOutlined(s, "DermaDefault", tx, ty, c, 0, 0, 1, Color(0, 0, 0, 255))
+            draw.SimpleTextOutlined(s, "DermaDefault", tx, ty, c, 0, 0, 1, COLOR_OUTLINE)
             ty = ty + 13
         end
         local flags = b.flags or 0
         if bit.band(flags, 1) ~= 0 then
-            textc(string.format(L{
-                ru = "ОГЛУШЕН %.1fс", uk = "ОСЛІПЛЕНИЙ %.1fс", es = "CEGADO %.1fs",
-                pt = "CEGADO %.1fs", en = "BLINDED %.1fs" },
-                (b.blind or 0) / 10), Color(255, 220, 80))
+            textc(string.format(st.blind, (b.blind or 0) / 10), ESPColors.blind)
         end
         if bit.band(flags, 2) ~= 0 then
-            textc(L{
-                ru = "ОГОНЬ — ОТХОД", uk = "ВОГОНЬ — ВІДХІД", es = "FUEGO — RETIRADA",
-                pt = "FOGO — RECUAR", en = "FIRE — BACK" }, Color(255, 140, 40))
+            textc(st.fire, ESPColors.fire)
         end
         if b.state == 4 then
-            local kinds = L{
-                ru = { "ищет", "выстрел", "шаги", "декой", "бомба" },
-                uk = { "шукає", "постріл", "кроки", "декой", "бомба" },
-                es = { "buscando", "disparos", "pasos", "señuelo", "bomba" },
-                pt = { "procurando", "tiros", "passos", "isca", "bomba" },
-                en = { "searching", "gunfire", "steps", "decoy", "bomb" } }
             -- Бомбу показывает отдельная строка, тут не дублируем
             if (b.snd or 0) ~= 4 then
-                textc("→ " .. (kinds[(b.snd or 0) + 1] or kinds[1]), Color(100, 200, 255))
+                textc("→ " .. (st.kinds[(b.snd or 0) + 1] or st.kinds[1]), ESPColors.sound)
             end
         end
         -- Статус бомбы: ставлю, убегаю, ищу, дефужу, не хватит времени
         if (b.bomb or 0) > 0 then
-            local words = L{
-                ru = { "ставлю", "убегаю", "ищу", "дефужу", "не хватит времени" },
-                uk = { "ставлю", "тікаю", "шукаю", "розміновую", "не вистачить часу" },
-                es = { "plantando", "huyendo", "buscando", "desactivando", "sin tiempo" },
-                pt = { "plantando", "fugindo", "procurando", "desarmando", "sem tempo" },
-                en = { "planting", "fleeing", "seeking", "defusing", "no time" } }
-            local bombWord = L{
-                ru = "БОМБА", uk = "БОМБА", es = "BOMBA",
-                pt = "BOMBA", en = "BOMB" }
-            textc(bombWord .. ": " .. (words[b.bomb] or "?"), Color(255, 150, 50))
+            textc(st.bombWord .. ": " .. (st.bomb[b.bomb] or "?"), ESPColors.bomb)
         end
         -- Читер: тир из команды спавна
         if (b.cheat or 0) > 0 then
-            local tiers = L{
-                ru = { "легит", "аим", "читак", "хвх" },
-                uk = { "легіт", "аім", "читер", "хвх" },
-                es = { "legit", "aim", "tramposo", "hvh" },
-                pt = { "legit", "aim", "trapaceiro", "hvh" },
-                en = { "legit", "aim", "cheater", "hvh" } }
-            local cheatWord = L{
-                ru = "ЧИТЕР", uk = "ЧИТЕР", es = "TRAMPOSO",
-                pt = "TRAPACEIRO", en = "CHEATER" }
-            textc(cheatWord .. ": " .. (tiers[b.cheat] or "?"), Color(255, 120, 120))
+            textc(st.cheatWord .. ": " .. (st.cheat[b.cheat] or "?"), ESPColors.cheat)
         end
 
         -- Путь до звука стелим по полу: сегменты между ног бота

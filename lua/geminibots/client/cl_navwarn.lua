@@ -17,7 +17,18 @@ function GeminiBots.ShowNavWarn()
     f:Center()
     f:SetTitle("")
     f:ShowCloseButton(false)
-    f:MakePopup()
+    -- Как у остальных окон: мышь диалогу, клавиатура игре. MakePopup здесь
+    -- запрещен: он захватывает клавиатуру, и на голой карте игрок не может
+    -- двигаться, пока не кликнет кнопку
+    f:SetMouseInputEnabled(true)
+    f:SetKeyboardInputEnabled(false)
+    gui.EnableScreenClicker(true)
+    f.OnRemove = function()
+        -- Курсор отдаем игре, только если больше нечего кликать
+        if not (IsValid(GeminiBots.SettingsFrame) or IsValid(GeminiBots.ArsenalFrame)) then
+            gui.EnableScreenClicker(false)
+        end
+    end
     T.MakeDraggable(f, 44)
 
     local fadeCv = GetConVar("geminibots_menu_fade")

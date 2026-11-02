@@ -422,7 +422,7 @@ local function GetTipFrame()
         T.RBox(1, 1, w - 2, h - 2, math.max(0, c - 1), T.Colors.card)
     end
     local lbl = vgui.Create("DLabel", TipFrame)
-    lbl:SetPos(10, 8)
+    lbl:SetPos(10, 9)
     lbl:SetSize(260, 20)
     lbl:SetFont("GeminiSmall")
     lbl:SetTextColor(T.Colors.text)
@@ -1067,8 +1067,8 @@ function T.AccentButton(parent, label)
         T.DrawSpaced(self.btnLabel, self.btnFont or "GeminiText", w / 2, h / 2,
             T.Colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1)
     end
-    b.DoClick = function() T.ClickSound() end
-    -- Клик слышно сразу при нажатии, а не после срабатывания кнопки
+    -- Звук клика уже играет в OnMousePressed: дефолтный DoClick со звуком
+    -- давал бы второй звук на кнопках без своего обработчика
     local OldPress = b.OnMousePressed
     function b:OnMousePressed(code)
         if code == MOUSE_LEFT then T.ClickSound() end

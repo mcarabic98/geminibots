@@ -345,8 +345,7 @@ function GeminiBots.OpenArsenal()
     chkEnabled:Dock(LEFT)
     chkEnabled:DockMargin(0, 0, 0, 0)
     chkEnabled:SetFont("GeminiSmall")
-    chkEnabled:SetTextColor(T.Colors.muted)
-    OnLang(function()
+    chkEnabled:SetTextColor(T.Colors.muted)    OnLang(function()
         if IsValid(chkEnabled) then
             chkEnabled:SetText(L{
                 ru = "Только включённые", uk = "Лише увімкнені",
@@ -476,6 +475,15 @@ function GeminiBots.OpenArsenal()
     countLabel:SetTextColor(T.Colors.muted)
     countLabel:SetContentAlignment(4)
     frame.CountLabel = countLabel
+
+    -- Цвета статичных подписей SetTextColor копирует один раз: при смене
+    -- темы без этой строки оставался старый цвет (применяем через ApplyLang)
+    OnLang(function()
+        if IsValid(countLabel) then countLabel:SetTextColor(T.Colors.muted) end
+        if IsValid(presetLabel) then presetLabel:SetTextColor(T.Colors.muted) end
+        if IsValid(chkEnabled) then chkEnabled:SetTextColor(T.Colors.muted) end
+        if IsValid(chkMissing) then chkMissing:SetTextColor(T.Colors.muted) end
+    end)
 
     local bulkDefs = {
         { label = L{

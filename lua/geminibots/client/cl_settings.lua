@@ -800,6 +800,9 @@ function GeminiBots.OpenSettings()
         nb.hover = 0
         nb.titleRU = t.ru
         nb.titleEN = t.en
+        -- Все языковые варианты сразу: в колбэке смены языка nb[lang]
+        -- не находил ключи uk/es/pt и всегда падал в английский
+        nb.GeminiLabels = t
         nb.navLabel = t[GeminiBots.GetMenuLang()] or t.en
         local tabId = t.id
         -- Иконка слева (своя векторная, красится в цвет текста)
@@ -876,14 +879,17 @@ function GeminiBots.CloseSettings()
     end)
 end
 
--- Пересбор открытых окон (смена темы/языка): текущая вкладка + Арсенал
+-- Пересбор открытых окон (смена темы/языка): текущая вкладка + Арсенал.
+-- Для арсенала берем ApplyLang: он обновляет и подписи с цветами статичных
+-- меток, а не только список строк
 function GeminiBots.RefreshOpenWindows()
     local fr = GeminiBots.SettingsFrame
     if IsValid(fr) and fr.GeminiCurrent then
         BuildTab(fr, fr.GeminiCurrent)
     end
-    if IsValid(GeminiBots.ArsenalFrame) then
-        GeminiBots.ArsenalFrame:RefreshList()
+    local ar = GeminiBots.ArsenalFrame
+    if IsValid(ar) then
+        if ar.ApplyLang then ar:ApplyLang() else ar:RefreshList() end
     end
 end
 
@@ -896,8 +902,9 @@ cvars.AddChangeCallback("geminibots_menu_lang", function()
     if IsValid(fr) then
         local lang = GeminiBots.GetMenuLang()
         for _, nb in pairs(fr.GeminiNav or {}) do
-            if IsValid(nb) and nb.titleRU then
-                nb.navLabel = nb[lang] or nb.titleEN
+            if IsValid(nb) then
+                local lbls = nb.GeminiLabels
+                nb.navLabel = lbls and (lbls[lang] or lbls.en) or nb.titleEN
             end
         end
         if fr.GeminiCurrent then BuildTab(fr, fr.GeminiCurrent) end
