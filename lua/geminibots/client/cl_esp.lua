@@ -335,7 +335,7 @@ hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
         -- Путь до звука стелим по полу: сегменты между ног бота
         -- и землей под звуком. Источник помечаем кругом.
         if b.state == 4 and b.invG then
-            surface.SetDrawColor(100, 200, 255, 200)
+            surface.SetDrawColor(ESPColors.sound.r, ESPColors.sound.g, ESPColors.sound.b, 200)
             local prev = nil
             for i = 0, 10 do
                 local t = i / 10
@@ -354,7 +354,8 @@ hook.Add("HUDPaint", "GeminiBots_DrawESP", function()
             local ip = b.invG:ToScreen()
             if ip.visible then
                 local r = math.Clamp(1400 / math.max(1, dist), 6, 24)
-                surface.DrawCircle(ip.x, ip.y, r, 100, 200, 255, 220)
+                local sc = ESPColors.sound
+                surface.DrawCircle(ip.x, ip.y, r, sc.r, sc.g, sc.b, 220)
             end
         end
         end -- showStatus

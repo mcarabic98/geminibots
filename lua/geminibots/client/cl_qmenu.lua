@@ -745,8 +745,8 @@ local function BuildSettingsMenu(panel, tab, opts)
     currentOpts = opts
     panel:ClearControls()
 
-    -- Кнопка переключения языка (RU / EN). В отдельном окне язык живет
-    -- в шапке окна, общая шапка там не строится (opts.noSharedHeader).
+    -- Кнопка переключения языка (авто / RU / UK / ES / PT / EN). В отдельном
+    -- окне язык живет в шапке окна, общая шапка там не строится (opts.noSharedHeader).
     if not (opts and opts.noSharedHeader) then
         local btnLang = panel:Button(T("LangButton"))
         btnLang.DoClick = function()

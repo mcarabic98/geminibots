@@ -640,6 +640,11 @@ GeminiBots.ConVarDescsUK = {
     ["geminibots_menu_particles_accent"] = "Частинки в кольорі акценту (викл = білі)",
     ["geminibots_menu_lang"] = "Мова меню: авто (як у GMod) / русский / українська / español / português / english",
     ["geminibots_menu_font"] = "Шрифт меню GeminiBots (Roboto та схожі)",
+    -- ESP-тултипы: без них uk/es/pt падали в английский фолбэк
+    ["geminibots_esp_boxes"] = "ESP: бокси навколо ботів (вкл/викл)",
+    ["geminibots_esp_hp"] = "ESP: смуга HP ліворуч від бокса (вкл/викл)",
+    ["geminibots_esp_info"] = "ESP: нік, стан, HP, ціль, зброя (вкл/викл)",
+    ["geminibots_esp_status"] = "ESP: сліпота, вогонь, бомба, звук і шлях (вкл/викл)",
 }
 
 -- Испанские описания для тултипов
@@ -701,6 +706,11 @@ GeminiBots.ConVarDescsES = {
     ["geminibots_menu_particles_accent"] = "Partículas en color de acento (no = blancas)",
     ["geminibots_menu_lang"] = "Idioma del menú: auto (como GMod) / русский / українська / español / português / english",
     ["geminibots_menu_font"] = "Fuente del menú GeminiBots (Roboto y similares)",
+    -- ESP-тултипы: без них uk/es/pt падали в английский фолбэк
+    ["geminibots_esp_boxes"] = "ESP: cajas alrededor de los bots (sí/no)",
+    ["geminibots_esp_hp"] = "ESP: barra de vida a la izquierda de la caja (sí/no)",
+    ["geminibots_esp_info"] = "ESP: apodo, estado, vida, objetivo, arma (sí/no)",
+    ["geminibots_esp_status"] = "ESP: ceguera, fuego, bomba, sonido y ruta (sí/no)",
 }
 
 -- Бразильские описания для тултипов (португальский)
@@ -762,6 +772,11 @@ GeminiBots.ConVarDescsPT = {
     ["geminibots_menu_particles_accent"] = "Partículas na cor de destaque (desligado = brancas)",
     ["geminibots_menu_lang"] = "Idioma do menu: auto (como o GMod) / русский / українська / español / português / english",
     ["geminibots_menu_font"] = "Fonte do menu GeminiBots (Roboto e similares)",
+    -- ESP-тултипы: без них uk/es/pt падали в английский фолбэк
+    ["geminibots_esp_boxes"] = "ESP: caixas ao redor dos bots (liga/desliga)",
+    ["geminibots_esp_hp"] = "ESP: barra de HP à esquerda da caixa (liga/desliga)",
+    ["geminibots_esp_info"] = "ESP: apelido, estado, vida, alvo, arma (liga/desliga)",
+    ["geminibots_esp_status"] = "ESP: cegueira, fogo, bomba, som e caminho (liga/desliga)",
 }
 
 -- Текст тултипа на языке меню + скобки из подписи
